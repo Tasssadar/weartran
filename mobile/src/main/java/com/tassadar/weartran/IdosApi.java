@@ -21,7 +21,12 @@ public class IdosApi {
     private static final String NAMESPACE = "http://ttws.chaps.cz/TT";
     private static final String URL = "http://ttws.timetable.cz/TT.asmx";
 
-
+    /*
+     * Implement this class yourself and make it return correct credentials.
+     * The API is closed, so I won't provide ones in this repo. Hint: it is not encrypted
+     * and there are Android applications already using it. I've heard wires and sharks
+     * are cool these days, too.
+     */
     public static abstract class Credentials {
         public abstract String getLogin();
         public abstract String getPassword();

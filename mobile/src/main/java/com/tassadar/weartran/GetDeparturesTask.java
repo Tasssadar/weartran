@@ -28,6 +28,8 @@ public class GetDeparturesTask extends AsyncTask<String, Void, byte[]> {
     protected byte[] doInBackground(String... args) {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(WeartranApp.ctx());
         String savedSessionId = pref.getString("IdosApiSession", null);
+
+        // See comment about credentials in IdosApi.java
         IdosApi api = new IdosApi(savedSessionId, new IdosApiCredentials());
 
         if(savedSessionId == null && !api.login())
