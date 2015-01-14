@@ -1,5 +1,8 @@
 package com.tassadar.weartran;
 
+import android.os.Bundle;
+import android.os.Parcel;
+
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Wearable;
@@ -32,11 +35,11 @@ public class DataService extends WearableListenerService implements GetDeparture
     }
 
     @Override
-    public void departuresRetreived(final String reqId, final String out) {
+    public void departuresRetreived(final String reqId, final byte[] out) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Wearable.MessageApi.sendMessage(m_api, reqId, DEPARTURES_RES_PATH, out.getBytes());
+                Wearable.MessageApi.sendMessage(m_api, reqId, DEPARTURES_RES_PATH, out);
             }
         }).start();
     }

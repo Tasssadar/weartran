@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.tassadar.weartran.ListItemLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <ImageView android:id="@+id/icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/connection"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="8dp"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_centerVertical="true"
+        android:layout_toEndOf="@id/icon"
+        android:gravity="center_vertical">
+        <TextView
+            android:id="@+id/departure"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceListItemSmall"
+            android:singleLine="true"
+            android:ellipsize="middle"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-condensed"/>
+        <TextView
+            android:id="@+id/arrival"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceListItemSmall"
+            android:singleLine="true"
+            android:ellipsize="middle"
+            android:fontFamily="sans-serif-condensed"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/extraInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#757575"
+        android:gravity="end"
+        android:textSize="12sp"
+        android:layout_centerVertical="true"
+        android:layout_alignParentEnd="true"
+        android:fontFamily="sans-serif-light"/>
+</com.tassadar.weartran.ListItemLayout>

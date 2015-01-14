@@ -156,9 +156,68 @@ public class IdosApi {
         String depTime;
         String arrTime;
         String[] trains;
+        int connId;
     }
 
     public final static SimpleDateFormat DEPARTURES_TIME_FMT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+
+    private int parseDeparturesInfo(SoapObject conns, ArrayList<DepartureInfo> output) {
+        final int cnt = conns.getPropertyCount();
+        int res = 0;
+        for(int i = 0; i < cnt; ++i) {
+            Object po = conns.getProperty(i);
+            if(!(po instanceof SoapObject) || !((SoapObject) po).hasProperty("aoTrains"))
+                continue;
+
+            DepartureInfo info = new DepartureInfo();
+            ArrayList<String> trains = new ArrayList<>();
+
+            SoapObject connInfo = (SoapObject)po;
+            final int cntInfo = connInfo.getPropertyCount();
+            for(int y = 0; y < cntInfo; ++y) {
+                po = connInfo.getProperty(y);
+                if(!(po instanceof SoapObject) || !((SoapObject) po).hasProperty("oTrain"))
+                    continue;
+
+                SoapObject tr = (SoapObject)po;
+                if(info.depTime == null)
+                    info.depTime = tr.getAttributeAsString("dtDateTime1");
+                info.arrTime = tr.getAttributeAsString("dtDateTime2");
+                trains.add(((SoapObject) tr.getProperty("oTrain")).getAttributeAsString("sNum1"));
+            }
+
+            if(!trains.isEmpty()) {
+                info.trains = new String[trains.size()];
+                for (int t = 0; t < info.trains.length; ++t)
+                    info.trains[t] = trains.get(t);
+                info.connId = Integer.parseInt(connInfo.getAttributeAsString("iID"));
+                output.add(info);
+                ++res;
+
+                Log.i(TAG, "Got departure " + info.depTime + " -> " + info.arrTime + ", trains " + trains);
+            }
+        }
+        return res;
+    }
+
+    private SoapObject getConnectionsPage(int connHandle, int prevConnId, boolean prev, int maxCount) throws IOException, XmlPullParserException {
+        SoapObject request = new SoapObject(NAMESPACE, "GetConnectionsPage");
+        request.addProperty("sSessionID", m_sessionId);
+        //request.addProperty("sUserDesc", "Pubtran.xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx");
+        request.addProperty("iRemMask", 0);
+        request.addProperty("iTTDetails", 2101264);
+        request.addProperty("iMaxCount", maxCount);
+        request.addProperty("sCombID", "IDSJMK"); // dopravni podnik
+        request.addProperty("iConnHandle", connHandle);
+        request.addProperty("bPrevConn", prev);
+        request.addProperty("iConnID", prevConnId);
+        Object o = callMethod(request);
+        if(o instanceof SoapFault12) {
+            Log.e(TAG, "Failed to call GetConnectionsPage: " + ((SoapFault12) o).faultstring);
+            return null;
+        }
+        return (SoapObject)o;
+    }
 
     public DepartureInfo[] getDepartures(final String from, final String to, final Date date, int count) {
         ArrayList<DepartureInfo> output = new ArrayList<>();
@@ -181,37 +240,29 @@ public class IdosApi {
             SoapObject connRes = (SoapObject) ((SoapObject)res).getProperty("Connection2Result");
             Log.i(TAG, "Got Connection2Result: " + connRes.toString());
 
-            SoapObject conns = (SoapObject)connRes.getProperty("oConnInfo");
-            final int cnt = conns.getPropertyCount();
-            for(int i = 0; i < cnt; ++i) {
-                Object po = conns.getProperty(i);
-                if(!(po instanceof SoapObject) || !((SoapObject) po).hasProperty("aoTrains"))
-                    continue;
+            if(!connRes.hasProperty("oConnInfo")) {
+                Log.e(TAG, "Connection2Result doesn't have oConnInfo, bad stop names?");
+                return null;
+            }
 
-                DepartureInfo info = new DepartureInfo();
-                ArrayList<String> trains = new ArrayList<>();
+            SoapObject oConnInfo = (SoapObject) connRes.getProperty("oConnInfo");
+            parseDeparturesInfo(oConnInfo, output);
 
-                SoapObject connInfo = (SoapObject)po;
-                final int cntInfo = connInfo.getPropertyCount();
-                for(int y = 0; y < cntInfo; ++y) {
-                    po = connInfo.getProperty(y);
-                    if(!(po instanceof SoapObject) || !((SoapObject) po).hasProperty("oTrain"))
-                        continue;
+            if(!output.isEmpty()) {
+                int connHandle = Integer.parseInt(((SoapObject) connRes.getProperty("oConnInfo")).getAttributeAsString("iHandle"));
+                for (int attempts = 0; output.size() < count && attempts < 50; ++attempts) {
+                    SoapObject page = getConnectionsPage(connHandle,
+                            output.get(output.size()-1).connId, false,
+                            Math.min(3, count - output.size()));
 
-                    SoapObject tr = (SoapObject)po;
-                    if(info.depTime == null)
-                        info.depTime = tr.getAttributeAsString("dtDateTime1");
-                    info.arrTime = tr.getAttributeAsString("dtDateTime2");
-                    trains.add(((SoapObject) tr.getProperty("oTrain")).getAttributeAsString("sNum1"));
-                }
+                    if(page == null)
+                        break;
 
-                if(!trains.isEmpty()) {
-                    info.trains = new String[trains.size()];
-                    for (int t = 0; t < info.trains.length; ++t)
-                        info.trains[t] = trains.get(t);
-                    output.add(info);
+                    page = (SoapObject) page.getProperty("GetConnectionsPageResult");
+                    if(parseDeparturesInfo(page, output) == 0)
+                        break;
 
-                    Log.i(TAG, "Got departure " + info.depTime + " -> " + info.arrTime + ", trains " + trains);
+                    connHandle = Integer.parseInt(page.getAttributeAsString("iHandle"));
                 }
             }
         } catch (XmlPullParserException | IOException e) {

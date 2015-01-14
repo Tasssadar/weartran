@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="744.09448819"
+   height="1052.3622047"
+   id="svg2"
+   inkscape:label="Pozadí"
+   version="1.1"
+   inkscape:version="0.48.5 r10040"
+   inkscape:export-filename="/home/tassadar/AndroidStudioProjects/Weartran/wear/icons_big/connection.png"
+   inkscape:export-xdpi="21.893602"
+   inkscape:export-ydpi="21.893602"
+   sodipodi:docname="connection.svg">
+  <defs
+     id="defs3" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.7"
+     inkscape:cx="626.24382"
+     inkscape:cy="545.02623"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     showguides="false"
+     inkscape:guide-bbox="true"
+     inkscape:window-width="1920"
+     inkscape:window-height="1032"
+     inkscape:window-x="-4"
+     inkscape:window-y="-3"
+     inkscape:window-maximized="1">
+    <sodipodi:guide
+       orientation="1,0"
+       position="372.04724,874.28571"
+       id="guide3760" />
+    <sodipodi:guide
+       orientation="0,1"
+       position="454.28571,319.28571"
+       id="guide3762" />
+    <sodipodi:guide
+       orientation="1,0"
+       position="491.94429,636.3961"
+       id="guide3764" />
+    <sodipodi:guide
+       orientation="1,0"
+       position="250.51783,456.58895"
+       id="guide3766" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata6">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Vrstva 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#333333;fill-opacity:0.6;stroke:none;stroke-width:94.87179565;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans"
+       d="m 1474.6237,-246.30902 c -144.4709,0 -262.6635,118.19269 -262.6635,262.663549 0,127.056581 91.4336,233.793831 211.7471,257.687361 l 0,326.08019 -110.591,-110.55117 -72.0553,72.09512 197.535,197.53513 36.0675,36.0674 36.0277,-36.0674 197.5749,-197.57494 -72.0952,-72.05531 -110.5511,110.55117 0,-326.08019 c 120.2893,-23.91277 211.7073,-130.64803 211.7073,-257.687361 0,-144.470859 -118.2325,-262.663549 -262.7034,-262.663549 z m 0,101.9125 c 89.3933,0 160.7909,71.357799 160.7909,160.751049 0,89.393261 -71.3976,160.790851 -160.7909,160.790851 -89.3933,0 -160.751,-71.39759 -160.751,-160.790851 0,-89.39325 71.3577,-160.751049 160.751,-160.751049 z"
+       id="path2984"
+       inkscape:connector-curvature="0" />
+    <path
+       sodipodi:type="arc"
+       style="fill:none;stroke:#333333;stroke-width:94.87179565;stroke-miterlimit:4;stroke-opacity:0.6;stroke-dasharray:none"
+       id="path2984-5"
+       sodipodi:cx="503.57144"
+       sodipodi:cy="453.07648"
+       sodipodi:rx="95.448723"
+       sodipodi:ry="95.448723"
+       d="m 599.02016,453.07648 a 95.448723,95.448723 0 1 1 -190.89744,0 95.448723,95.448723 0 1 1 190.89744,0 z"
+       transform="matrix(0.84324325,0,0,0.84324325,-1066.0618,-309.72693)" />
+    <path
+       style="fill:none;stroke:#333333;stroke-width:80;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:0.63921569;stroke-dasharray:none"
+       d="M -796.51912,472.07927 -641.42857,627.16982 -486.33295,472.0742"
+       id="path3774-7"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:none;stroke:#333333;stroke-width:80;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:0.63921569;stroke-dasharray:none"
+       d="m -641.42857,142.84705 0,479.82246"
+       id="path3776-3"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#333333;fill-opacity:0.6;stroke:none;stroke-width:94.87179565;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans"
+       d="m 373.08493,58.799384 c -84.38095,0 -153.8582,69.477256 -153.8582,153.858196 0,66.51549 43.19604,123.80295 102.8116,145.07771 l 0,440.22202 -68.00891,-68.00891 -72.27944,72.27943 155.2152,155.21521 36.15967,36.11975 36.11975,-36.11975 153.0999,-153.13983 -72.23954,-72.23951 -65.89361,65.89361 0,-440.22202 c 59.60605,-21.28483 102.7717,-78.57543 102.7717,-145.07771 0,-84.38094 -69.51715,-153.858196 -153.89812,-153.858196 z m 0,102.173016 c 29.16255,0 51.72509,22.52264 51.72509,51.68518 0,29.16255 -22.56254,51.72508 -51.72509,51.72508 -29.16254,0 -51.68517,-22.56253 -51.68517,-51.72508 0,-29.16254 22.52263,-51.68518 51.68517,-51.68518 z"
+       id="path2984-5-2"
+       inkscape:connector-curvature="0"
+       inkscape:export-xdpi="24.593105"
+       inkscape:export-ydpi="24.593105"
+       inkscape:export-filename="/home/tassadar/AndroidStudioProjects/Weartran/wear/icons_big/connection.png" />
+    <path
+       sodipodi:type="arc"
+       style="fill:none;stroke:#333333;stroke-width:94.87179565;stroke-miterlimit:4;stroke-opacity:0.6;stroke-dasharray:none"
+       id="path2984-5-2-1"
+       sodipodi:cx="503.57144"
+       sodipodi:cy="453.07648"
+       sodipodi:rx="95.448723"
+       sodipodi:ry="95.448723"
+       d="m 599.02016,453.07648 a 95.448723,95.448723 0 1 1 -190.89744,0 95.448723,95.448723 0 1 1 190.89744,0 z"
+       transform="matrix(0.84324325,0,0,0.84324325,-1108.1028,501.70164)" />
+    <path
+       style="fill:none;stroke:#333333;stroke-width:80;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:0.63921569;stroke-dasharray:none"
+       d="m -683.46953,954.27562 0,479.82248"
+       id="path3776-3-1-1"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#333333;stroke-width:80;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:0.63921569;stroke-dasharray:none"
+       d="m -804.99894,1317.069 121.52941,121.5294 119.89705,-119.8971"
+       id="path3855-6"
+       inkscape:connector-curvature="0" />
+    <rect
+       style="fill:none;stroke:none"
+       id="rect3888"
+       width="397.14282"
+       height="1045.7141"
+       x="173.47583"
+       y="5.2193236"
+       inkscape:export-filename="/home/tassadar/AndroidStudioProjects/Weartran/wear/icons_big/connection.png"
+       inkscape:export-xdpi="21.982016"
+       inkscape:export-ydpi="21.982016" />
+  </g>
+</svg>

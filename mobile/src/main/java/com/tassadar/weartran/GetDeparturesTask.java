@@ -2,17 +2,21 @@ package com.tassadar.weartran;
 
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.lang.ref.WeakReference;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class GetDeparturesTask extends AsyncTask<String, Void, String> {
+public class GetDeparturesTask extends AsyncTask<String, Void, byte[]> {
 
     public interface OnCompleteListener {
-        public void departuresRetreived(String reqId, String out);
+        public void departuresRetreived(String reqId, byte[] out);
     }
 
     public GetDeparturesTask(String id, OnCompleteListener listener) {
@@ -21,7 +25,7 @@ public class GetDeparturesTask extends AsyncTask<String, Void, String> {
     }
 
     @Override
-    protected String doInBackground(String... args) {
+    protected byte[] doInBackground(String... args) {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(WeartranApp.ctx());
         String savedSessionId = pref.getString("IdosApiSession", null);
         IdosApi api = new IdosApi(savedSessionId, new IdosApiCredentials());
@@ -29,32 +33,9 @@ public class GetDeparturesTask extends AsyncTask<String, Void, String> {
         if(savedSessionId == null && !api.login())
             return null;
 
-        IdosApi.DepartureInfo[] out = api.getDepartures(args[0], args[1], new Date(), 3);
-        if(out == null || out.length == 0)
+        IdosApi.DepartureInfo[] dep = api.getDepartures(args[0], args[1], new Date(), 9);
+        if(dep == null || dep.length == 0)
             return null;
-
-        final SimpleDateFormat fmt = new SimpleDateFormat("HH:mm");
-        StringBuilder result = new StringBuilder();
-        for(IdosApi.DepartureInfo i : out) {
-            result.append("[");
-            for(int y = 0; y < i.trains.length-1; ++y)
-                result.append(i.trains[y]).append(", ");
-            if(i.trains.length >= 1)
-                result.append(i.trains[i.trains.length-1]);
-            result.append("]");
-
-            try {
-                Date dep = IdosApi.DEPARTURES_TIME_FMT.parse(i.depTime);
-                Date arr = IdosApi.DEPARTURES_TIME_FMT.parse(i.arrTime);
-                result.append("  ")
-                    .append(fmt.format(dep))
-                    .append(" -> ")
-                    .append(fmt.format(arr));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            result.append("\n");
-        }
 
         if(savedSessionId == null || !savedSessionId.equals(api.getSessionId())) {
             SharedPreferences.Editor e = pref.edit();
@@ -62,14 +43,38 @@ public class GetDeparturesTask extends AsyncTask<String, Void, String> {
             e.apply();
         }
 
-        return result.toString();
+        ByteArrayOutputStream bs = null;
+        ObjectOutputStream out = null;
+        try {
+            bs = new ByteArrayOutputStream();
+            out = new ObjectOutputStream(bs);
+            out.writeInt(dep.length);
+
+            for(IdosApi.DepartureInfo i : dep) {
+                out.writeObject(IdosApi.DEPARTURES_TIME_FMT.parse(i.depTime));
+                out.writeObject(IdosApi.DEPARTURES_TIME_FMT.parse(i.arrTime));
+                out.writeInt(i.trains.length);
+                for(String tr : i.trains) {
+                    out.writeUTF(tr);
+                }
+            }
+            out.close();
+            out = null;
+            return bs.toByteArray();
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+        } finally {
+            if(out != null) { try { out.close(); } catch(IOException e) { e.printStackTrace(); } }
+            if(bs != null) { try { bs.close(); } catch(IOException e) { e.printStackTrace(); } }
+        }
+        return null;
     }
 
-    protected void onPostExecute(String result) {
+    protected void onPostExecute(byte[] result) {
         OnCompleteListener l = m_listener.get();
-        if(l != null) {
-            l.departuresRetreived(m_reqId, result != null ? result : "");
-        }
+        if(l == null)
+            return;
+        l.departuresRetreived(m_reqId, result);
     }
 
     private String m_reqId;
