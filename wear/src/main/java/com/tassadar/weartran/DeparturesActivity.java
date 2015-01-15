@@ -2,7 +2,6 @@ package com.tassadar.weartran;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.os.Looper;
 import android.support.wearable.view.WearableListView;
 import android.view.View;
 import android.widget.TextView;
@@ -16,11 +15,8 @@ import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -136,6 +132,8 @@ public class DeparturesActivity extends Activity implements MessageApi.MessageLi
         v.setVisibility(View.GONE);
         v = findViewById(R.id.time);
         v.setVisibility(View.VISIBLE);
+        v = findViewById(R.id.error);
+        v.setVisibility(View.GONE);
     }
 
     private boolean parseDepartures() {

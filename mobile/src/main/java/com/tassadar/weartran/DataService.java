@@ -1,7 +1,6 @@
 package com.tassadar.weartran;
 
-import android.os.Bundle;
-import android.os.Parcel;
+import android.util.Log;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.MessageEvent;
@@ -23,12 +22,19 @@ public class DataService extends WearableListenerService implements GetDeparture
         m_api.connect();
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        m_api.disconnect();
+    }
+
     public void onMessageReceived (final MessageEvent ev) {
         if(ev.getPath().equals(GET_DEPARTURES_PATH)) {
             String data[] = new String(ev.getData()).split("\\n");
             final String from = data[0];
             final String to = data[1];
 
+            Log.i(TAG, "Handling departures request for path " + from + " -> " + to);
             GetDeparturesTask task = new GetDeparturesTask(ev.getSourceNodeId(), this);
             task.execute(from, to);
         }

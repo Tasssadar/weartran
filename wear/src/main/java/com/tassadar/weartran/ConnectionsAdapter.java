@@ -15,7 +15,6 @@ public class ConnectionsAdapter extends WearableListView.Adapter {
             { "Česká", "Švermova" },
             { "Švermova", "Hlavní nádraží" },
             { "Hlavní nádraží", "Švermova" },
-            { "Hlavní nádraží šíleně dlouhá zastávka", "Švermova" },
     };
 
     public static class ConnectionViewHolder extends WearableListView.ViewHolder {

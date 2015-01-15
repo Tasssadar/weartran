@@ -2,7 +2,6 @@ package com.tassadar.weartran;
 
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.preference.PreferenceManager;
 
 import java.io.ByteArrayOutputStream;
@@ -10,7 +9,6 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.ref.WeakReference;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class GetDeparturesTask extends AsyncTask<String, Void, byte[]> {
