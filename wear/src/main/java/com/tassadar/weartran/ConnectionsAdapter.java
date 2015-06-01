@@ -11,10 +11,12 @@ public class ConnectionsAdapter extends WearableListView.Adapter {
     private static final String[][] stations = {
             { "Švermova", "Hrnčířská"},
             { "Hrnčířská", "Švermova" },
-            { "Švermova", "Česká" },
-            { "Česká", "Švermova" },
+            { "Švermova", "Vojtova" },
+            { "Vojtova", "Švermova" },
             { "Švermova", "Hlavní nádraží" },
             { "Hlavní nádraží", "Švermova" },
+            { "Švermova", "Česká" },
+            { "Česká", "Švermova" },
     };
 
     public static class ConnectionViewHolder extends WearableListView.ViewHolder {

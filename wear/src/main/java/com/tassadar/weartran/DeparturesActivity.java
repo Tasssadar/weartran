@@ -1,7 +1,9 @@
 package com.tassadar.weartran;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.wearable.activity.WearableActivity;
 import android.support.wearable.view.WearableListView;
 import android.view.View;
 import android.widget.TextView;
@@ -22,7 +24,7 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 
-public class DeparturesActivity extends Activity implements MessageApi.MessageListener, GoogleApiClient.ConnectionCallbacks, ResultCallback<MessageApi.SendMessageResult> {
+public class DeparturesActivity extends WearableActivity implements MessageApi.MessageListener, GoogleApiClient.ConnectionCallbacks, ResultCallback<MessageApi.SendMessageResult> {
     private static final String GET_DEPARTURES_PATH = "/get-departures";
     private static final String DEPARTURES_RES_PATH = "/departures-res";
 
@@ -80,15 +82,15 @@ public class DeparturesActivity extends Activity implements MessageApi.MessageLi
 
     private void sendMessageToCompanion(final String path, final byte[] data) {
         Wearable.NodeApi.getConnectedNodes(m_api).setResultCallback(
-            new ResultCallback<NodeApi.GetConnectedNodesResult>() {
-                @Override
-                public void onResult(NodeApi.GetConnectedNodesResult getConnectedNodesResult) {
-                    for (final Node node : getConnectedNodesResult.getNodes()) {
-                        Wearable.MessageApi.sendMessage(m_api, node.getId(), path, data)
-                                .setResultCallback(DeparturesActivity.this);
+                new ResultCallback<NodeApi.GetConnectedNodesResult>() {
+                    @Override
+                    public void onResult(NodeApi.GetConnectedNodesResult getConnectedNodesResult) {
+                        for (final Node node : getConnectedNodesResult.getNodes()) {
+                            Wearable.MessageApi.sendMessage(m_api, node.getId(), path, data)
+                                    .setResultCallback(DeparturesActivity.this);
+                        }
                     }
                 }
-            }
         );
     }
 
@@ -134,6 +136,8 @@ public class DeparturesActivity extends Activity implements MessageApi.MessageLi
         v.setVisibility(View.VISIBLE);
         v = findViewById(R.id.error);
         v.setVisibility(View.GONE);
+
+        setAmbientEnabled();
     }
 
     private boolean parseDepartures() {
@@ -142,6 +146,19 @@ public class DeparturesActivity extends Activity implements MessageApi.MessageLi
         try {
             bs = new ByteArrayInputStream(m_departures);
             out = new ObjectInputStream(bs);
+
+            String from = null;
+            String to = null;
+
+            Bundle extras = getIntent().getExtras();
+            if(extras != null) {
+                from = extras.getString("from", null);
+                to = extras.getString("to", null);
+                if(from != null)
+                    from = from.toLowerCase();
+                if(to != null)
+                    to = to.toLowerCase();
+            }
 
             final int count = out.readInt();
             if(count == 0) {
@@ -165,6 +182,15 @@ public class DeparturesActivity extends Activity implements MessageApi.MessageLi
                 if(trainCnt >= 0)
                     extraInfo.append(out.readUTF());
                 extraInfo.append("\n");
+
+                final String depStation = out.readUTF().toLowerCase();
+                final String arrStation = out.readUTF().toLowerCase();
+
+                if(from != null && !depStation.equals(from))
+                    dep.departure += "*";
+
+                if(to != null && !arrStation.equals(to))
+                    dep.arrival += "*";
 
                 final long durationMs = arrTime.getTime() - depTime.getTime();
                 extraInfo.append(TimeUnit.MINUTES.convert(durationMs, TimeUnit.MILLISECONDS))
@@ -201,6 +227,48 @@ public class DeparturesActivity extends Activity implements MessageApi.MessageLi
         } else {
             updateTime();
         }
+    }
+
+    @Override
+    public void onEnterAmbient(Bundle ambientDetails) {
+        super.onEnterAmbient(ambientDetails);
+
+        View l = findViewById(R.id.main_layout);
+        l.setBackgroundColor(Color.BLACK);
+
+        TextView t = (TextView)l.findViewById(R.id.time);
+        t.setTextColor(Color.WHITE);
+
+        WearableListView lst = (WearableListView) findViewById(R.id.departuresList);
+        DeparturesAdapter adapter = (DeparturesAdapter) lst.getAdapter();
+        if(adapter != null) {
+            adapter.setAmbient(true);
+        }
+    }
+
+    @Override
+    public void onExitAmbient() {
+        super.onExitAmbient();
+
+        View l = findViewById(R.id.main_layout);
+        l.setBackgroundColor(Color.WHITE);
+
+        TextView t = (TextView)l.findViewById(R.id.time);
+        t.setTextColor(Color.BLACK);
+
+        WearableListView lst = (WearableListView) findViewById(R.id.departuresList);
+        DeparturesAdapter adapter = (DeparturesAdapter) lst.getAdapter();
+        if(adapter != null) {
+            adapter.setAmbient(false);
+        }
+
+        updateTime();
+    }
+
+    @Override
+    public void onUpdateAmbient() {
+        super.onUpdateAmbient();
+        updateTime();
     }
 
     private SimpleDateFormat m_timeFmt = new SimpleDateFormat("HH:mm");

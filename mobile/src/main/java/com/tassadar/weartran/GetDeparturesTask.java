@@ -57,6 +57,8 @@ public class GetDeparturesTask extends AsyncTask<String, Void, byte[]> {
                 for(String tr : i.trains) {
                     out.writeUTF(tr);
                 }
+                out.writeUTF(i.depStation);
+                out.writeUTF(i.arrStation);
             }
             out.close();
             out = null;

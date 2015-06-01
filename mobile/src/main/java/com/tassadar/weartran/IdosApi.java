@@ -160,6 +160,8 @@ public class IdosApi {
     public static class DepartureInfo {
         String depTime;
         String arrTime;
+        String depStation;
+        String arrStation;
         String[] trains;
         int connId;
     }
@@ -189,6 +191,21 @@ public class IdosApi {
                     info.depTime = tr.getAttributeAsString("dtDateTime1");
                 info.arrTime = tr.getAttributeAsString("dtDateTime2");
                 trains.add(((SoapObject) tr.getProperty("oTrain")).getAttributeAsString("sNum1"));
+
+                SoapObject oTrain = (SoapObject) po;
+                final int oTrainPropsCnt = ((SoapObject) po).getPropertyCount();
+                for(int z = 0; z < oTrainPropsCnt; ++z) {
+                    po = oTrain.getProperty(z);
+                    if(!(po instanceof SoapObject) || !((SoapObject) po).hasProperty("oStation"))
+                        continue;
+
+                    final SoapObject rt = (SoapObject)po;
+                    final String sName = ((SoapObject)rt.getProperty("oStation")).getAttributeAsString("sName");
+                    if(info.depStation == null)
+                        info.depStation = sName;
+                    else
+                        info.arrStation = sName;
+                }
             }
 
             if(!trains.isEmpty()) {
@@ -199,7 +216,7 @@ public class IdosApi {
                 output.add(info);
                 ++res;
 
-                Log.i(TAG, "Got departure " + info.depTime + " -> " + info.arrTime + ", trains " + trains);
+                Log.i(TAG, "Got departure " + info.depTime + " -> " + info.arrTime + ", trains " + trains + ", from \"" + info.depStation + "\" to \"" + info.arrStation + "\"");
             }
         }
         return res;
