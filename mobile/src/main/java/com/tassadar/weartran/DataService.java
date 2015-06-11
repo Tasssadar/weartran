@@ -31,12 +31,13 @@ public class DataService extends WearableListenerService implements GetDeparture
     public void onMessageReceived (final MessageEvent ev) {
         if(ev.getPath().equals(GET_DEPARTURES_PATH)) {
             String data[] = new String(ev.getData()).split("\\n");
-            final String from = data[0];
-            final String to = data[1];
+            final String dp = data[0];
+            final String from = data[1];
+            final String to = data[2];
 
             Log.i(TAG, "Handling departures request for path " + from + " -> " + to);
             GetDeparturesTask task = new GetDeparturesTask(ev.getSourceNodeId(), this);
-            task.execute(from, to);
+            task.execute(dp, from, to);
         }
     }
 

@@ -33,7 +33,7 @@ public class GetDeparturesTask extends AsyncTask<String, Void, byte[]> {
         if(savedSessionId == null && !api.login())
             return null;
 
-        IdosApi.DepartureInfo[] dep = api.getDepartures(args[0], args[1], new Date(), 9);
+        IdosApi.DepartureInfo[] dep = api.getDepartures(args[0], args[1], args[2], new Date(), 9);
         if(dep == null || dep.length == 0)
             return null;
 

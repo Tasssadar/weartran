@@ -76,7 +76,9 @@ public class DeparturesActivity extends WearableActivity implements MessageApi.M
         if(extras == null || !extras.containsKey("from") || !extras.containsKey("to"))
             return;
 
-        String req = extras.getString("from") + "\n" + extras.getString("to");
+        final String req = extras.getString("dp") + "\n" +
+                extras.getString("from") + "\n" +
+                extras.getString("to");
         sendMessageToCompanion(GET_DEPARTURES_PATH, req.getBytes());
     }
 
@@ -192,8 +194,13 @@ public class DeparturesActivity extends WearableActivity implements MessageApi.M
                 if(to != null && !arrStation.equals(to))
                     dep.arrival += "*";
 
-                final long durationMs = arrTime.getTime() - depTime.getTime();
-                extraInfo.append(TimeUnit.MINUTES.convert(durationMs, TimeUnit.MILLISECONDS))
+                long durationMin = TimeUnit.MINUTES.convert(arrTime.getTime() - depTime.getTime(), TimeUnit.MILLISECONDS);
+                if(durationMin >= 60)  {
+                    extraInfo.append(durationMin/60)
+                            .append("h ");
+                    durationMin = durationMin%60;
+                }
+                extraInfo.append(durationMin)
                         .append(" min");
                 dep.extraInfo = extraInfo.toString();
                 departures[i] = dep;

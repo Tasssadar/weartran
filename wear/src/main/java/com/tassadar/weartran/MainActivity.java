@@ -16,11 +16,13 @@ public class MainActivity extends Activity implements WearableListView.ClickList
         v.setAdapter(new ConnectionsAdapter());
         v.setClickListener(this);
     }
+
     @Override
     public void onClick(WearableListView.ViewHolder viewHolder) {
         ConnectionsAdapter.ConnectionViewHolder h = (ConnectionsAdapter.ConnectionViewHolder)viewHolder;
 
         Intent intent = new Intent(this, DeparturesActivity.class);
+        intent.putExtra("dp", h.getDp());
         intent.putExtra("from", h.getFromStop());
         intent.putExtra("to", h.getToStop());
         startActivity(intent);

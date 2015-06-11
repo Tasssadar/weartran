@@ -96,14 +96,14 @@ public class IdosApi {
         return tag;
     }
 
-    public SoapObject buildConnection2Req(final String from, final String to, final Date date, boolean isDepTime, int maxCount) {
+    public SoapObject buildConnection2Req(final String dp, final String from, final String to, final Date date, boolean isDepTime, int maxCount) {
         SoapObject request = new SoapObject(NAMESPACE, "Connection2");
         request.addProperty("sSessionID", m_sessionId);
         //request.addProperty("sUserDesc", "Pubtran.xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx");
         request.addProperty("iRemMask", 0);
         request.addProperty("iTTDetails", 2101264);
         request.addProperty("iMaxCount", maxCount);
-        request.addProperty("sCombID", "IDSJMK"); // dopravni podnik
+        request.addProperty("sCombID", dp); // dopravni podnik
 
         request.addSoapObject(createStationInfo("aoFrom", from));
         request.addSoapObject(createStationInfo("aoTo", to));
@@ -222,14 +222,14 @@ public class IdosApi {
         return res;
     }
 
-    private SoapObject getConnectionsPage(int connHandle, int prevConnId, boolean prev, int maxCount) throws IOException, XmlPullParserException {
+    private SoapObject getConnectionsPage(final String dp, int connHandle, int prevConnId, boolean prev, int maxCount) throws IOException, XmlPullParserException {
         SoapObject request = new SoapObject(NAMESPACE, "GetConnectionsPage");
         request.addProperty("sSessionID", m_sessionId);
         //request.addProperty("sUserDesc", "Pubtran.xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx");
         request.addProperty("iRemMask", 0);
         request.addProperty("iTTDetails", 2101264);
         request.addProperty("iMaxCount", maxCount);
-        request.addProperty("sCombID", "IDSJMK"); // dopravni podnik
+        request.addProperty("sCombID", dp); // dopravni podnik
         request.addProperty("iConnHandle", connHandle);
         request.addProperty("bPrevConn", prev);
         request.addProperty("iConnID", prevConnId);
@@ -241,12 +241,12 @@ public class IdosApi {
         return (SoapObject)o;
     }
 
-    public DepartureInfo[] getDepartures(final String from, final String to, final Date date, int count) {
+    public DepartureInfo[] getDepartures(final String dp, final String from, final String to, final Date date, int count) {
         ArrayList<DepartureInfo> output = new ArrayList<>();
         try {
             Object res = null;
             for (int i = 0; i < 2; ++i) {
-                SoapObject req = buildConnection2Req(from, to, date, true, count);
+                SoapObject req = buildConnection2Req(dp, from, to, date, true, count);
                 res = callMethod(req);
                 if (res instanceof SoapFault12) {
                     SoapFault f = (SoapFault12) res;
@@ -273,7 +273,7 @@ public class IdosApi {
             if(!output.isEmpty()) {
                 int connHandle = Integer.parseInt(((SoapObject) connRes.getProperty("oConnInfo")).getAttributeAsString("iHandle"));
                 for (int attempts = 0; output.size() < count && attempts < 50; ++attempts) {
-                    SoapObject page = getConnectionsPage(connHandle,
+                    SoapObject page = getConnectionsPage(dp, connHandle,
                             output.get(output.size()-1).connId, false,
                             Math.min(3, count - output.size()));
 
