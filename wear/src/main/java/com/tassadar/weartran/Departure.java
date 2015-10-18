@@ -4,4 +4,6 @@ public class Departure {
     String departure;
     String arrival;
     String extraInfo;
+    String delayQuery;
+    int delayMinutes;
 }

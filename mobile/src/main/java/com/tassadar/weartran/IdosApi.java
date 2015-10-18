@@ -21,6 +21,8 @@ public class IdosApi {
     private static final String NAMESPACE = "http://ttws.chaps.cz/TT";
     private static final String URL = "http://ttws.timetable.cz/TT.asmx";
 
+    private static final int FLAG_HAS_DELAY = 0x200000;
+
     /*
      * Implement this class yourself and make it return correct credentials.
      * The API is closed, so I won't provide ones in this repo. Hint: it is not encrypted
@@ -158,12 +160,18 @@ public class IdosApi {
     }
 
     public static class DepartureInfo {
+        public DepartureInfo() {
+            delayMinutes = -1; // not loaded
+        }
+
         String depTime;
         String arrTime;
         String depStation;
         String arrStation;
         String[] trains;
         int connId;
+        String delayQuery;
+        int delayMinutes;
     }
 
     public final static SimpleDateFormat DEPARTURES_TIME_FMT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -186,16 +194,21 @@ public class IdosApi {
                 if(!(po instanceof SoapObject) || !((SoapObject) po).hasProperty("oTrain"))
                     continue;
 
-                SoapObject tr = (SoapObject)po;
+                final SoapObject oTrains = (SoapObject)po;
                 if(info.depTime == null)
-                    info.depTime = tr.getAttributeAsString("dtDateTime1");
-                info.arrTime = tr.getAttributeAsString("dtDateTime2");
-                trains.add(((SoapObject) tr.getProperty("oTrain")).getAttributeAsString("sNum1"));
+                    info.depTime = oTrains.getAttributeAsString("dtDateTime1");
+                info.arrTime = oTrains.getAttributeAsString("dtDateTime2");
 
-                SoapObject oTrain = (SoapObject) po;
-                final int oTrainPropsCnt = ((SoapObject) po).getPropertyCount();
-                for(int z = 0; z < oTrainPropsCnt; ++z) {
-                    po = oTrain.getProperty(z);
+                if(info.delayQuery == null && oTrains.hasAttribute("sDelayQuery")) {
+                    info.delayQuery = oTrains.getAttributeAsString("sDelayQuery");
+                }
+
+                final SoapObject oTrain = ((SoapObject) oTrains.getProperty("oTrain"));
+                trains.add(oTrain.getAttributeAsString("sNum1"));
+
+                final int oTrainsPropsCnt = oTrains.getPropertyCount();
+                for(int z = 0; z < oTrainsPropsCnt; ++z) {
+                    po = oTrains.getProperty(z);
                     if(!(po instanceof SoapObject) || !((SoapObject) po).hasProperty("oStation"))
                         continue;
 
@@ -216,7 +229,8 @@ public class IdosApi {
                 output.add(info);
                 ++res;
 
-                Log.i(TAG, "Got departure " + info.depTime + " -> " + info.arrTime + ", trains " + trains + ", from \"" + info.depStation + "\" to \"" + info.arrStation + "\"");
+                Log.i(TAG, String.format("Departure %s -> %s, trains %s, \"%s\" -> \"%s\", delayQuery: %s",
+                        info.depTime, info.arrTime, trains.toString(), info.depStation, info.arrStation, info.delayQuery));
             }
         }
         return res;
@@ -241,7 +255,31 @@ public class IdosApi {
         return (SoapObject)o;
     }
 
-    public DepartureInfo[] getDepartures(final String dp, final String from, final String to, final Date date, int count) {
+    public int getDelay(String delayQuery) throws IOException, XmlPullParserException {
+        SoapObject request = new SoapObject(NAMESPACE, "DelayQuery");
+        request.addProperty("sSessionID", m_sessionId);
+        //request.addProperty("sUserDesc", "Pubtran.xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx");
+        request.addProperty("iRemMask", 0);
+        request.addProperty("iTTDetails", 2101264);
+        request.addProperty("iMaxCount", 3);
+        request.addProperty("sDelayQuery", delayQuery);
+        Object o = callMethod(request);
+        if(o instanceof SoapFault12) {
+            Log.e(TAG, "Failed to call DelayQuery: " + ((SoapFault12) o).faultstring);
+            return -1;
+        }
+
+        final SoapObject res = (SoapObject) ((SoapObject) o).getProperty("DelayQueryResult");
+        if(res.hasProperty("aoInfo")) {
+            final SoapObject aoInfo = (SoapObject) res.getProperty("aoInfo");
+            if(aoInfo.hasAttribute("iDelay")) {
+                return Integer.parseInt(aoInfo.getAttributeAsString("iDelay"));
+            }
+        }
+        return 0;
+    }
+
+    public DepartureInfo[] getDepartures(final String dp, final String from, final String to, final Date date, int count, boolean loadDelays) {
         ArrayList<DepartureInfo> output = new ArrayList<>();
         try {
             Object res = null;
@@ -285,6 +323,17 @@ public class IdosApi {
                         break;
 
                     connHandle = Integer.parseInt(page.getAttributeAsString("iHandle"));
+                }
+            }
+
+            if(loadDelays) {
+                for(int i = 0; i < output.size(); ++i) {
+                    DepartureInfo info = output.get(i);
+                    if(info.delayQuery != null) {
+                        info.delayMinutes = getDelay(info.delayQuery);
+                    } else {
+                        info.delayMinutes = 0;
+                    }
                 }
             }
         } catch (XmlPullParserException | IOException e) {

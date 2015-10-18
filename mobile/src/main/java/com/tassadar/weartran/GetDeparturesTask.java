@@ -33,7 +33,7 @@ public class GetDeparturesTask extends AsyncTask<String, Void, byte[]> {
         if(savedSessionId == null && !api.login())
             return null;
 
-        IdosApi.DepartureInfo[] dep = api.getDepartures(args[0], args[1], args[2], new Date(), 9);
+        IdosApi.DepartureInfo[] dep = api.getDepartures(args[0], args[1], args[2], new Date(), 9, true);
         if(dep == null || dep.length == 0)
             return null;
 
@@ -59,6 +59,8 @@ public class GetDeparturesTask extends AsyncTask<String, Void, byte[]> {
                 }
                 out.writeUTF(i.depStation);
                 out.writeUTF(i.arrStation);
+                out.writeUTF(i.delayQuery != null ? i.delayQuery : "");
+                out.writeInt(i.delayMinutes);
             }
             out.close();
             out = null;

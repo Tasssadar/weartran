@@ -203,6 +203,10 @@ public class DeparturesActivity extends WearableActivity implements MessageApi.M
                 extraInfo.append(durationMin)
                         .append(" min");
                 dep.extraInfo = extraInfo.toString();
+
+                dep.delayQuery = out.readUTF();
+                dep.delayMinutes = out.readInt();
+
                 departures[i] = dep;
             }
 

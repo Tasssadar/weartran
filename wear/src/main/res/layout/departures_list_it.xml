@@ -3,49 +3,70 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:orientation="vertical">
 
-    <ImageView android:id="@+id/icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/connection"
-        android:layout_centerVertical="true"
-        android:layout_marginEnd="8dp"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_centerVertical="true"
-        android:layout_toEndOf="@id/icon"
-        android:gravity="center_vertical">
-        <TextView
-            android:id="@+id/departure"
+        <ImageView android:id="@+id/icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceListItemSmall"
-            android:singleLine="true"
-            android:ellipsize="middle"
-            android:textStyle="bold"
-            android:fontFamily="sans-serif-condensed"/>
-        <TextView
-            android:id="@+id/arrival"
+            android:src="@drawable/connection"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="8dp"/>
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceListItemSmall"
-            android:singleLine="true"
-            android:ellipsize="middle"
-            android:fontFamily="sans-serif-condensed"/>
-    </LinearLayout>
+            android:orientation="vertical"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@id/icon"
+            android:gravity="center_vertical">
+            <TextView
+                android:id="@+id/departure"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceListItemSmall"
+                android:singleLine="true"
+                android:ellipsize="middle"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-condensed"/>
+            <TextView
+                android:id="@+id/arrival"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceListItemSmall"
+                android:singleLine="true"
+                android:ellipsize="middle"
+                android:fontFamily="sans-serif-condensed"/>
+        </LinearLayout>
 
-    <TextView
-        android:id="@+id/extraInfo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#757575"
-        android:gravity="end"
-        android:textSize="12sp"
-        android:layout_centerVertical="true"
-        android:layout_alignParentEnd="true"
-        android:fontFamily="sans-serif-light"/>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"
+            android:orientation="vertical"
+            android:gravity="center_vertical|end">
+            <TextView
+                android:id="@+id/extraInfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#757575"
+                android:gravity="end"
+                android:textSize="12sp"
+                android:fontFamily="sans-serif-light"/>
+            <TextView
+                android:id="@+id/delay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceListItemSmall"
+                android:singleLine="true"
+                android:gravity="end"
+                android:visibility="gone"
+                android:fontFamily="sans-serif-condensed"
+                android:textSize="12sp"/>
+        </LinearLayout>
+    </RelativeLayout>
 </com.tassadar.weartran.ListItemLayout>

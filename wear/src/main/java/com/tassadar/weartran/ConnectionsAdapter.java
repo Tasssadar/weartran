@@ -20,14 +20,14 @@ public class ConnectionsAdapter extends WearableListView.Adapter {
     };
 
     private static final Connection[] stations = {
-            new Connection("IDSJMK", "Švermova", "Hrnčířská"),
-            new Connection("IDSJMK", "Hrnčířská", "Švermova"),
-            new Connection("IDSJMK", "Švermova", "Vojtova"),
-            new Connection("IDSJMK", "Vojtova", "Švermova"),
-            new Connection("IDSJMK", "Švermova", "Hlavní nádraží"),
+            new Connection("IDSJMK", "Životského", "Vojtova"),
+            new Connection("IDSJMK", "Vojtova", "Životského"),
+            new Connection("IDSJMK", "Životského", "Hlavní nádraží"),
+            new Connection("IDSJMK", "Hlavní nádraží", "Životského"),
+            new Connection("IDSJMK", "Životského", "Švermova"),
+            new Connection("IDSJMK", "Švermova", "Životského"),
             new Connection("IDSJMK", "Hlavní nádraží", "Švermova"),
-            new Connection("IDSJMK", "Švermova", "Česká"),
-            new Connection("IDSJMK", "Česká", "Švermova"),
+            new Connection("IDSJMK", "Vojtova", "Švermova"),
             new Connection("VlakBusCZ", "Brno hl.n.", "Praha hl.n."),
             new Connection("VlakBusCZ", "Praha hl.n.", "Brno hl.n."),
     };

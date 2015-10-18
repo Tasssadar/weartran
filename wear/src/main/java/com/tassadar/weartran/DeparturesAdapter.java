@@ -14,6 +14,7 @@ public class DeparturesAdapter extends WearableListView.Adapter {
     public static class DepartureViewHolder extends WearableListView.ViewHolder {
         private TextView m_arrival;
         private TextView m_departure;
+        private TextView m_delay;
         private TextView m_extraInfo;
         private ImageView m_icon;
 
@@ -21,6 +22,7 @@ public class DeparturesAdapter extends WearableListView.Adapter {
             super(v);
             m_departure = (TextView)v.findViewById(R.id.departure);
             m_arrival = (TextView)v.findViewById(R.id.arrival);
+            m_delay = (TextView)v.findViewById(R.id.delay);
             m_extraInfo = (TextView)v.findViewById(R.id.extraInfo);
             m_icon = (ImageView)v.findViewById(R.id.icon);
         }
@@ -34,6 +36,14 @@ public class DeparturesAdapter extends WearableListView.Adapter {
             m_arrival.setTextColor(!ambient ? Color.BLACK : Color.WHITE);
             m_extraInfo.setTextColor(!ambient ? 0xFF757575 : 0xFFFFFFFF);
             m_icon.setVisibility(!ambient ? View.VISIBLE : View.GONE);
+
+            if(dep.delayMinutes > 0) {
+                m_delay.setText(String.format("%d min", dep.delayMinutes));
+                m_delay.setTextColor(!ambient ? 0xFFE64A19 : Color.WHITE);
+                m_delay.setVisibility(View.VISIBLE);
+            } else {
+                m_delay.setVisibility(View.GONE);
+            }
         }
     }
 
