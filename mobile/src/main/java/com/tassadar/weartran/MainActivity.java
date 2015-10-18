@@ -12,15 +12,6 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                IdosApi api = new IdosApi(null, new IdosApiCredentials());
-                api.getDepartures("VlakBusCZ", "Brno hl.n.", "Praha hl.n.", new Date(), 9, true);
-            }
-        }).start();
-
     }
 
     @Override
