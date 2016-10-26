@@ -2,10 +2,13 @@ package com.tassadar.weartran;
 
 import android.util.Log;
 
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
+
+import java.util.concurrent.TimeUnit;
 
 public class DataService extends WearableListenerService implements GetDeparturesTask.OnCompleteListener {
     private static final String TAG = "Weartran:DataService";
@@ -46,7 +49,19 @@ public class DataService extends WearableListenerService implements GetDeparture
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Wearable.MessageApi.sendMessage(m_api, reqId, DEPARTURES_RES_PATH, out);
+                GoogleApiClient api = new GoogleApiClient.Builder(DataService.this)
+                        .addApi(Wearable.API)
+                        .build();
+
+                ConnectionResult res = api.blockingConnect(5, TimeUnit.SECONDS);
+                if(!res.isSuccess()) {
+                    Log.i(TAG, "Failed to connect to google play wearable api: " + res.getErrorMessage());
+                    return;
+                }
+
+                Log.i(TAG, "Sending result to the watch " + reqId + " " + api.isConnected());
+                Wearable.MessageApi.sendMessage(api, reqId, DEPARTURES_RES_PATH, out);
+                api.disconnect();
             }
         }).start();
     }
