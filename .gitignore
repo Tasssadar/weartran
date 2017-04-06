@@ -5,4 +5,4 @@
 .DS_Store
 /build
 
-/mobile/src/main/java/com/tassadar/weartran/IdosApiCredentials.java
+/wear/src/main/java/com/tassadar/weartran/api/IdosApiCredentials.java

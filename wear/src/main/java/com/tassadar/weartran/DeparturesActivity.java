@@ -1,20 +1,14 @@
 package com.tassadar.weartran;
 
-import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
 import android.support.wearable.view.WearableListView;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.wearable.MessageApi;
-import com.google.android.gms.wearable.MessageEvent;
-import com.google.android.gms.wearable.Node;
-import com.google.android.gms.wearable.NodeApi;
-import com.google.android.gms.wearable.Wearable;
+import com.tassadar.weartran.api.GetDeparturesTask;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -24,24 +18,23 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 
-public class DeparturesActivity extends WearableActivity implements MessageApi.MessageListener, GoogleApiClient.ConnectionCallbacks, ResultCallback<MessageApi.SendMessageResult> {
+public class DeparturesActivity extends WearableActivity implements GetDeparturesTask.OnCompleteListener {
     private static final String GET_DEPARTURES_PATH = "/get-departures";
     private static final String DEPARTURES_RES_PATH = "/departures-res";
+    private static final String TAG = "Weartran:DeparturesAct";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_departures);
-        m_api = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addApi(Wearable.API)
-                .build();
 
         if(savedInstanceState != null && savedInstanceState.containsKey("departures")) {
             m_departures = savedInstanceState.getByteArray("departures");
             updateTime();
             parseDepartures();
         }
+
+        requestDepartures();
     }
 
     @Override
@@ -50,23 +43,7 @@ public class DeparturesActivity extends WearableActivity implements MessageApi.M
         out.putByteArray("departures", m_departures);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        m_api.connect();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Wearable.MessageApi.removeListener(m_api, this);
-        m_api.disconnect();
-    }
-
-    @Override
-    public void onConnected(Bundle bundle) {
-        Wearable.MessageApi.addListener(m_api, this);
-
+    private void requestDepartures() {
         if(m_departures != null) {
             updateTime();
             return;
@@ -76,30 +53,22 @@ public class DeparturesActivity extends WearableActivity implements MessageApi.M
         if(extras == null || !extras.containsKey("from") || !extras.containsKey("to"))
             return;
 
-        final String req = extras.getString("dp") + "\n" +
-                extras.getString("from") + "\n" +
-                extras.getString("to");
-        sendMessageToCompanion(GET_DEPARTURES_PATH, req.getBytes());
-    }
-
-    private void sendMessageToCompanion(final String path, final byte[] data) {
-        Wearable.NodeApi.getConnectedNodes(m_api).setResultCallback(
-                new ResultCallback<NodeApi.GetConnectedNodesResult>() {
-                    @Override
-                    public void onResult(NodeApi.GetConnectedNodesResult getConnectedNodesResult) {
-                        for (final Node node : getConnectedNodesResult.getNodes()) {
-                            Wearable.MessageApi.sendMessage(m_api, node.getId(), path, data)
-                                    .setResultCallback(DeparturesActivity.this);
-                        }
-                    }
-                }
-        );
+        String dp = extras.getString("dp");
+        String from = extras.getString("from");
+        String to = extras.getString("to");
+        Log.i(TAG, "Handling departures request for path " + from + " -> " + to);
+        GetDeparturesTask task = new GetDeparturesTask(this);
+        task.execute(dp, from, to);
     }
 
     @Override
-    public void onResult(MessageApi.SendMessageResult res) {
-        if(!res.getStatus().isSuccess()) {
+    public void departuresRetreived(byte[] data) {
+        m_departures = data;
+        if(m_departures == null || m_departures.length == 0 || !parseDepartures()) {
             setError(getString(R.string.dep_failed));
+            m_departures = null;
+        } else {
+            updateTime();
         }
     }
 
@@ -119,11 +88,6 @@ public class DeparturesActivity extends WearableActivity implements MessageApi.M
     private void updateTime() {
         TextView v = (TextView)findViewById(R.id.time);
         v.setText(m_timeFmt.format(new Date()));
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
     }
 
     private void fillDeparturesList(Departure[] departures) {
@@ -227,20 +191,6 @@ public class DeparturesActivity extends WearableActivity implements MessageApi.M
     }
 
     @Override
-    public void onMessageReceived(MessageEvent ev) {
-        if(!ev.getPath().equals(DEPARTURES_RES_PATH))
-            return;
-
-        m_departures = ev.getData();
-        if(m_departures == null || m_departures.length == 0 || !parseDepartures()) {
-            setError(getString(R.string.dep_failed));
-            m_departures = null;
-        } else {
-            updateTime();
-        }
-    }
-
-    @Override
     public void onEnterAmbient(Bundle ambientDetails) {
         super.onEnterAmbient(ambientDetails);
 
@@ -283,6 +233,5 @@ public class DeparturesActivity extends WearableActivity implements MessageApi.M
     }
 
     private SimpleDateFormat m_timeFmt = new SimpleDateFormat("HH:mm");
-    private GoogleApiClient m_api;
     private byte[] m_departures;
 }

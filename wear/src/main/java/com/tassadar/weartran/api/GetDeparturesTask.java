@@ -1,8 +1,10 @@
-package com.tassadar.weartran;
+package com.tassadar.weartran.api;
 
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+
+import com.tassadar.weartran.WeartranApp;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -14,11 +16,10 @@ import java.util.Date;
 public class GetDeparturesTask extends AsyncTask<String, Void, byte[]> {
 
     public interface OnCompleteListener {
-        public void departuresRetreived(String reqId, byte[] out);
+        public void departuresRetreived(byte[] out);
     }
 
-    public GetDeparturesTask(String id, OnCompleteListener listener) {
-        m_reqId = id;
+    public GetDeparturesTask(OnCompleteListener listener) {
         m_listener = new WeakReference<>(listener);
     }
 
@@ -78,9 +79,7 @@ public class GetDeparturesTask extends AsyncTask<String, Void, byte[]> {
         OnCompleteListener l = m_listener.get();
         if(l == null)
             return;
-        l.departuresRetreived(m_reqId, result);
+        l.departuresRetreived(result);
     }
-
-    private String m_reqId;
     private WeakReference<OnCompleteListener> m_listener;
 }

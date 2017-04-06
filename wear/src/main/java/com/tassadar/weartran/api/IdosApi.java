@@ -1,4 +1,4 @@
-package com.tassadar.weartran;
+package com.tassadar.weartran.api;
 
 import android.util.Log;
 
