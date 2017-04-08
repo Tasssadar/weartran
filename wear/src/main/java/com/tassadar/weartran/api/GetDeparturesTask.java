@@ -3,6 +3,7 @@ package com.tassadar.weartran.api;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.tassadar.weartran.WeartranApp;
 
@@ -12,11 +13,14 @@ import java.io.ObjectOutputStream;
 import java.lang.ref.WeakReference;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.List;
 
-public class GetDeparturesTask extends AsyncTask<String, Void, byte[]> {
+public class GetDeparturesTask extends AsyncTask<String, List<DepartureInfo>, Boolean> implements IdosApi.DeparturesBlockListener {
+    private static final String TAG = "Weartran:GetDepartures";
 
     public interface OnCompleteListener {
-        public void departuresRetreived(byte[] out);
+        void departuresRetreived(List<DepartureInfo> departures);
+        void allDeparturesRetreived(boolean success);
     }
 
     public GetDeparturesTask(OnCompleteListener listener) {
@@ -24,62 +28,50 @@ public class GetDeparturesTask extends AsyncTask<String, Void, byte[]> {
     }
 
     @Override
-    protected byte[] doInBackground(String... args) {
+    protected Boolean doInBackground(String... args) {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(WeartranApp.ctx());
         String savedSessionId = pref.getString("IdosApiSession", null);
 
         // See comment about credentials in IdosApi.java
         IdosApi api = new IdosApi(savedSessionId, new IdosApiCredentials());
 
+        long start = System.currentTimeMillis();
         if(savedSessionId == null && !api.login())
-            return null;
+            return false;
+        Log.i(TAG, "Login took " + (System.currentTimeMillis() - start) + "ms");
 
-        IdosApi.DepartureInfo[] dep = api.getDepartures(args[0], args[1], args[2], new Date(), 9, true);
+        DepartureInfo[] dep = api.getDepartures(args[0], args[1], args[2], new Date(), 9, true, this);
         if(dep == null || dep.length == 0)
-            return null;
+            return false;
 
         if(savedSessionId == null || !savedSessionId.equals(api.getSessionId())) {
             SharedPreferences.Editor e = pref.edit();
             e.putString("IdosApiSession", api.getSessionId());
             e.apply();
         }
-
-        ByteArrayOutputStream bs = null;
-        ObjectOutputStream out = null;
-        try {
-            bs = new ByteArrayOutputStream();
-            out = new ObjectOutputStream(bs);
-            out.writeInt(dep.length);
-
-            for(IdosApi.DepartureInfo i : dep) {
-                out.writeObject(IdosApi.DEPARTURES_TIME_FMT.parse(i.depTime));
-                out.writeObject(IdosApi.DEPARTURES_TIME_FMT.parse(i.arrTime));
-                out.writeInt(i.trains.length);
-                for(String tr : i.trains) {
-                    out.writeUTF(tr);
-                }
-                out.writeUTF(i.depStation);
-                out.writeUTF(i.arrStation);
-                out.writeUTF(i.delayQuery != null ? i.delayQuery : "");
-                out.writeInt(i.delayMinutes);
-            }
-            out.close();
-            out = null;
-            return bs.toByteArray();
-        } catch (IOException | ParseException e) {
-            e.printStackTrace();
-        } finally {
-            if(out != null) { try { out.close(); } catch(IOException e) { e.printStackTrace(); } }
-            if(bs != null) { try { bs.close(); } catch(IOException e) { e.printStackTrace(); } }
-        }
-        return null;
+        return true;
     }
 
-    protected void onPostExecute(byte[] result) {
+    @Override
+    public void onDeparturesBlockFetched(List<DepartureInfo> block) {
+        this.publishProgress(block);
+    }
+
+    @Override
+    protected void onProgressUpdate(List<DepartureInfo>... departures) {
         OnCompleteListener l = m_listener.get();
         if(l == null)
             return;
-        l.departuresRetreived(result);
+        l.departuresRetreived(departures[0]);
     }
+
+    @Override
+    protected void onPostExecute(Boolean res) {
+        OnCompleteListener l = m_listener.get();
+        if(l == null)
+            return;
+        l.allDeparturesRetreived(res);
+    }
+
     private WeakReference<OnCompleteListener> m_listener;
 }

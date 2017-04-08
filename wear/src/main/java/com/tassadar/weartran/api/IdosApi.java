@@ -11,9 +11,11 @@ import org.ksoap2.transport.HttpTransportSE;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class IdosApi {
     private static final String TAG = "Weartran:IdosApi";
@@ -159,20 +161,6 @@ public class IdosApi {
         return m_sessionId;
     }
 
-    public static class DepartureInfo {
-        public DepartureInfo() {
-            delayMinutes = -1; // not loaded
-        }
-
-        String depTime;
-        String arrTime;
-        String depStation;
-        String arrStation;
-        String[] trains;
-        int connId;
-        String delayQuery;
-        int delayMinutes;
-    }
 
     public final static SimpleDateFormat DEPARTURES_TIME_FMT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
@@ -195,9 +183,19 @@ public class IdosApi {
                     continue;
 
                 final SoapObject oTrains = (SoapObject)po;
-                if(info.depTime == null)
-                    info.depTime = oTrains.getAttributeAsString("dtDateTime1");
-                info.arrTime = oTrains.getAttributeAsString("dtDateTime2");
+                if(info.depTime == null) {
+                    try {
+                        info.depTime = DEPARTURES_TIME_FMT.parse(oTrains.getAttributeAsString("dtDateTime1"));
+                    } catch(ParseException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                try {
+                    info.arrTime = DEPARTURES_TIME_FMT.parse(oTrains.getAttributeAsString("dtDateTime2"));
+                } catch(ParseException e) {
+                    e.printStackTrace();
+                }
 
                 if(info.delayQuery == null && oTrains.hasAttribute("sDelayQuery")) {
                     info.delayQuery = oTrains.getAttributeAsString("sDelayQuery");
@@ -279,14 +277,25 @@ public class IdosApi {
         return 0;
     }
 
-    public DepartureInfo[] getDepartures(final String dp, final String from, final String to, final Date date, int count, boolean loadDelays) {
+    public interface DeparturesBlockListener {
+        void onDeparturesBlockFetched(List<DepartureInfo> block);
+    }
+
+    public DepartureInfo[] getDepartures(final String dp, final String from, final String to, final Date date, int count, boolean loadDelays, DeparturesBlockListener listener) {
         ArrayList<DepartureInfo> output = new ArrayList<>();
         try {
             Object res = null;
             for (int i = 0; i < 2; ++i) {
+                long start = System.currentTimeMillis();
+
                 SoapObject req = buildConnection2Req(dp, from, to, date, true, count);
                 res = callMethod(req);
-                if (res instanceof SoapFault12) {
+
+                Log.i(TAG, "Connection2req took " + (System.currentTimeMillis() - start) + "ms");
+
+                if (!(res instanceof SoapFault12)) {
+                    break;
+                } else {
                     SoapFault f = (SoapFault12) res;
                     if (i == 0 && f.faultcode.equals("CL1001")) {
                         login();
@@ -298,7 +307,6 @@ public class IdosApi {
             }
 
             SoapObject connRes = (SoapObject) ((SoapObject)res).getProperty("Connection2Result");
-            Log.i(TAG, "Got Connection2Result: " + connRes.toString());
 
             if(!connRes.hasProperty("oConnInfo")) {
                 Log.e(TAG, "Connection2Result doesn't have oConnInfo, bad stop names?");
@@ -308,19 +316,29 @@ public class IdosApi {
             SoapObject oConnInfo = (SoapObject) connRes.getProperty("oConnInfo");
             parseDeparturesInfo(oConnInfo, output);
 
+            if(listener != null)
+                listener.onDeparturesBlockFetched(output);
+
             if(!output.isEmpty()) {
                 int connHandle = Integer.parseInt(((SoapObject) connRes.getProperty("oConnInfo")).getAttributeAsString("iHandle"));
                 for (int attempts = 0; output.size() < count && attempts < 50; ++attempts) {
+                    long start = System.currentTimeMillis();
                     SoapObject page = getConnectionsPage(dp, connHandle,
                             output.get(output.size()-1).connId, false,
                             Math.min(3, count - output.size()));
+
+                    Log.i(TAG, "GetConnectionsPage took " + (System.currentTimeMillis() - start) + "ms");
 
                     if(page == null)
                         break;
 
                     page = (SoapObject) page.getProperty("GetConnectionsPageResult");
+                    int offset = output.size();
                     if(parseDeparturesInfo(page, output) == 0)
                         break;
+
+                    if(listener != null)
+                        listener.onDeparturesBlockFetched(output.subList(offset, output.size()));
 
                     connHandle = Integer.parseInt(page.getAttributeAsString("iHandle"));
                 }
@@ -330,7 +348,9 @@ public class IdosApi {
                 for(int i = 0; i < output.size(); ++i) {
                     DepartureInfo info = output.get(i);
                     if(info.delayQuery != null) {
+                        long start = System.currentTimeMillis();
                         info.delayMinutes = getDelay(info.delayQuery);
+                        Log.i(TAG, "getDelay took " + (System.currentTimeMillis() - start) + "ms");
                     } else {
                         info.delayMinutes = 0;
                     }

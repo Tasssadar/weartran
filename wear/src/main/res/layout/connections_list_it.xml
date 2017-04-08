@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.tassadar.weartran.ListItemLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:layout_marginTop="10dp"
-    android:layout_marginBottom="10dp">
+    android:layout_marginBottom="10dp"
+    android:paddingStart="15dp">
 
     <ImageView android:id="@+id/icon"
         android:layout_width="wrap_content"
@@ -26,7 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceListItemSmall"
-            android:singleLine="true"
+            android:maxLines="1"
             android:ellipsize="middle"
             android:textStyle="bold"
             android:fontFamily="sans-serif-condensed"/>
@@ -35,8 +36,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceListItemSmall"
-            android:singleLine="true"
+            android:maxLines="1"
             android:ellipsize="middle"
             android:fontFamily="sans-serif-condensed"/>
     </LinearLayout>
-</com.tassadar.weartran.ListItemLayout>
+</RelativeLayout>

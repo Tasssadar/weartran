@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.tassadar.weartran.ListItemLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingLeft="15dp"
+    android:paddingRight="15dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -28,7 +30,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceListItemSmall"
-                android:singleLine="true"
+                android:maxLines="1"
                 android:ellipsize="middle"
                 android:textStyle="bold"
                 android:fontFamily="sans-serif-condensed"/>
@@ -37,7 +39,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceListItemSmall"
-                android:singleLine="true"
+                android:maxLines="1"
                 android:ellipsize="middle"
                 android:fontFamily="sans-serif-condensed"/>
         </LinearLayout>
@@ -62,11 +64,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceListItemSmall"
-                android:singleLine="true"
+                android:maxLines="1"
                 android:gravity="end"
                 android:visibility="gone"
                 android:fontFamily="sans-serif-condensed"
                 android:textSize="12sp"/>
         </LinearLayout>
     </RelativeLayout>
-</com.tassadar.weartran.ListItemLayout>
+</RelativeLayout>

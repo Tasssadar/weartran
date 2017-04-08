@@ -1,36 +1,75 @@
 package com.tassadar.weartran;
 
 import android.graphics.Color;
-import android.media.Image;
-import android.support.wearable.view.WearableListView;
+import android.support.wearable.view.WearableRecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class DeparturesAdapter extends WearableListView.Adapter {
+import com.tassadar.weartran.api.DepartureInfo;
 
-    public static class DepartureViewHolder extends WearableListView.ViewHolder {
+import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+public class DeparturesAdapter extends WearableRecyclerView.Adapter<DeparturesAdapter.DepartureViewHolder> {
+
+    public static class DepartureViewHolder extends WearableRecyclerView.ViewHolder {
         private TextView m_arrival;
         private TextView m_departure;
         private TextView m_delay;
         private TextView m_extraInfo;
         private ImageView m_icon;
+        private String m_from;
+        private String m_to;
 
-        public DepartureViewHolder(View v) {
+        private static final SimpleDateFormat fmt = new SimpleDateFormat("HH:mm");
+
+        public DepartureViewHolder(View v, String from, String to) {
             super(v);
             m_departure = (TextView)v.findViewById(R.id.departure);
             m_arrival = (TextView)v.findViewById(R.id.arrival);
             m_delay = (TextView)v.findViewById(R.id.delay);
             m_extraInfo = (TextView)v.findViewById(R.id.extraInfo);
             m_icon = (ImageView)v.findViewById(R.id.icon);
+
+            m_from = from;
+            m_to = to;
         }
 
-        public void setData(Departure dep, boolean ambient) {
-            m_departure.setText(dep.departure);
-            m_arrival.setText(dep.arrival);
-            m_extraInfo.setText(dep.extraInfo);
+        public void setData(DepartureInfo dep, boolean ambient) {
+            String departure = fmt.format(dep.depTime);
+            String arrival = fmt.format(dep.arrTime);
+            if(m_from != null && !dep.depStation.toLowerCase().equals(m_from))
+                departure += "*";
+
+            if(m_to != null && !dep.arrStation.toLowerCase().equals(m_to))
+                arrival += "*";
+
+            m_departure.setText(departure);
+            m_arrival.setText(arrival);
+
+            StringBuilder extraInfo = new StringBuilder();
+            extraInfo.append("# ");
+            for(int i = 0; i < dep.trains.length; ++i) {
+                extraInfo.append(dep.trains[i]);
+                if(i+1 < dep.trains.length)
+                    extraInfo.append(", ");
+            }
+            extraInfo.append("\n");
+
+            long durationMin = TimeUnit.MINUTES.convert(dep.arrTime.getTime() - dep.depTime.getTime(), TimeUnit.MILLISECONDS);
+            if(durationMin >= 60)  {
+                extraInfo.append(durationMin/60)
+                        .append("h ");
+                durationMin = durationMin%60;
+            }
+            extraInfo.append(durationMin)
+                    .append(" min");
+
+            m_extraInfo.setText(extraInfo.toString());
 
             m_departure.setTextColor(!ambient ? Color.BLACK : Color.WHITE);
             m_arrival.setTextColor(!ambient ? Color.BLACK : Color.WHITE);
@@ -47,25 +86,27 @@ public class DeparturesAdapter extends WearableListView.Adapter {
         }
     }
 
-    public DeparturesAdapter(Departure[] departures) {
+    public DeparturesAdapter(List<DepartureInfo> departures, String from, String to) {
         super();
         m_departures = departures;
+        m_from = from.toLowerCase();
+        m_to = to.toLowerCase();
     }
 
     @Override
-    public WearableListView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public DepartureViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.departures_list_it, parent, false);
-        return new DepartureViewHolder(v);
+        return new DepartureViewHolder(v, m_from, m_to);
     }
 
     @Override
-    public void onBindViewHolder(WearableListView.ViewHolder holder, int position) {
-        ((DepartureViewHolder)holder).setData(m_departures[position], m_ambientMode);
+    public void onBindViewHolder(DepartureViewHolder holder, int position) {
+        holder.setData(m_departures.get(position), m_ambientMode);
     }
 
     @Override
     public int getItemCount() {
-        return m_departures.length;
+        return m_departures.size();
     }
 
     public void setAmbient(boolean ambient) {
@@ -75,6 +116,7 @@ public class DeparturesAdapter extends WearableListView.Adapter {
         this.notifyDataSetChanged();
     }
 
-    private Departure[] m_departures;
+    private List<DepartureInfo> m_departures;
+    private String m_from, m_to;
     private boolean m_ambientMode = false;
 }

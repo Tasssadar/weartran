@@ -1,12 +1,13 @@
 package com.tassadar.weartran;
 
 import android.support.wearable.view.WearableListView;
+import android.support.wearable.view.WearableRecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-public class ConnectionsAdapter extends WearableListView.Adapter {
+public class ConnectionsAdapter extends WearableRecyclerView.Adapter<ConnectionsAdapter.ConnectionViewHolder> {
     private static class Connection {
         public Connection(final String dp, final String from, final String to) {
             this.dp = dp;
@@ -32,7 +33,7 @@ public class ConnectionsAdapter extends WearableListView.Adapter {
             new Connection("VlakBusCZ", "Praha hl.n.", "Brno hl.n."),
     };
 
-    public static class ConnectionViewHolder extends WearableListView.ViewHolder {
+    public static class ConnectionViewHolder extends WearableRecyclerView.ViewHolder {
         private TextView m_from;
         private TextView m_to;
         private Connection m_conn;
@@ -60,15 +61,28 @@ public class ConnectionsAdapter extends WearableListView.Adapter {
         public String getDp() { return m_conn.dp; }
     }
 
-    @Override
-    public WearableListView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.connections_list_it, parent, false);
-        return new ConnectionViewHolder(v);
+    private final ItemClickListener m_listener;
+
+    ConnectionsAdapter(ItemClickListener listener) {
+        m_listener = listener;
     }
 
     @Override
-    public void onBindViewHolder(WearableListView.ViewHolder holder, int position) {
-        ((ConnectionViewHolder)holder).setStops(stations[position]);
+    public ConnectionViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.connections_list_it, parent, false);
+        final ConnectionViewHolder holder = new ConnectionViewHolder(v);
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                m_listener.onItemClick(holder);
+            }
+        });
+        return holder;
+    }
+
+    @Override
+    public void onBindViewHolder(ConnectionViewHolder holder, int position) {
+        holder.setStops(stations[position]);
     }
 
     @Override

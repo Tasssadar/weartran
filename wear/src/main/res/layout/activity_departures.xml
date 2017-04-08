@@ -6,16 +6,9 @@
     tools:context=".DeparturesActivity"
     tools:deviceIds="wear">
 
-    <ProgressBar android:id="@+id/progressbar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:indeterminateOnly="true"
-        android:layout_centerInParent="true"/>
-
     <TextView android:id="@+id/time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:singleLine="false"
         android:fontFamily="sans-serif-condensed"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="8dp"
@@ -23,26 +16,25 @@
         android:layout_alignParentTop="true"
         android:visibility="gone"/>
 
-    <android.support.wearable.view.BoxInsetLayout
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <android.support.wearable.view.WearableRecyclerView
+        android:id="@+id/departuresList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="20dp"
-        tools:deviceIds="wear">
-        <android.support.wearable.view.WearableListView
-            android:id="@+id/departuresList"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_centerInParent="true"
-            app:layout_box="left|right"
-            android:visibility="gone"/>
-        <TextView android:id="@+id/error"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_gravity="center"
-            android:layout_margin="25dp"
-            android:visibility="gone"/>
-    </android.support.wearable.view.BoxInsetLayout>
+        android:layout_centerInParent="true"
+        android:visibility="gone"/>
+    <TextView android:id="@+id/error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:layout_margin="25dp"
+        android:visibility="gone"/>
+
+    <ProgressBar android:id="@+id/progressbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminateOnly="true"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true" />
 
 </RelativeLayout>

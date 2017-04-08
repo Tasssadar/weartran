@@ -3,19 +3,20 @@ package com.tassadar.weartran;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
-import android.support.wearable.view.WearableListView;
+import android.support.wearable.view.CurvedChildLayoutManager;
+import android.support.wearable.view.WearableRecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.TextView;
 
+import com.tassadar.weartran.api.DepartureInfo;
 import com.tassadar.weartran.api.GetDeparturesTask;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
+import java.util.List;
 
 
 public class DeparturesActivity extends WearableActivity implements GetDeparturesTask.OnCompleteListener {
@@ -28,23 +29,35 @@ public class DeparturesActivity extends WearableActivity implements GetDeparture
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_departures);
 
-        if(savedInstanceState != null && savedInstanceState.containsKey("departures")) {
-            m_departures = savedInstanceState.getByteArray("departures");
-            updateTime();
-            parseDepartures();
-        }
+        m_departures = new ArrayList<>();
 
-        requestDepartures();
+        m_adapter = new DeparturesAdapter(m_departures, getIntent().getStringExtra("from"), getIntent().getStringExtra("to"));
+        WearableRecyclerView lst = (WearableRecyclerView) findViewById(R.id.departuresList);
+        lst.setCenterEdgeItems(true);
+        if(getResources().getConfiguration().isScreenRound())
+            lst.setLayoutManager(new ResizingCurvedLayoutManager(this));
+        else
+            lst.setLayoutManager(new CurvedChildLayoutManager(this));
+        lst.setAdapter(m_adapter);
+
+        if(savedInstanceState != null && savedInstanceState.containsKey("departures")) {
+            DepartureInfo.deserialize(savedInstanceState.getByteArray("departures"), m_departures);
+            fillDeparturesList(true);
+            updateTime();
+        } else {
+            requestDepartures();
+        }
     }
 
     @Override
     protected void onSaveInstanceState(Bundle out) {
         super.onSaveInstanceState(out);
-        out.putByteArray("departures", m_departures);
+        if(!m_departures.isEmpty())
+            out.putByteArray("departures", DepartureInfo.serialize(m_departures));
     }
 
     private void requestDepartures() {
-        if(m_departures != null) {
+        if(!m_departures.isEmpty()) {
             updateTime();
             return;
         }
@@ -52,6 +65,8 @@ public class DeparturesActivity extends WearableActivity implements GetDeparture
         Bundle extras = getIntent().getExtras();
         if(extras == null || !extras.containsKey("from") || !extras.containsKey("to"))
             return;
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         String dp = extras.getString("dp");
         String from = extras.getString("from");
@@ -62,13 +77,34 @@ public class DeparturesActivity extends WearableActivity implements GetDeparture
     }
 
     @Override
-    public void departuresRetreived(byte[] data) {
-        m_departures = data;
-        if(m_departures == null || m_departures.length == 0 || !parseDepartures()) {
+    public void departuresRetreived(List<DepartureInfo> departures) {
+        m_departures.addAll(departures);
+        if(m_departures.isEmpty()) {
             setError(getString(R.string.dep_failed));
-            m_departures = null;
         } else {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    fillDeparturesList(false);
+                }
+            });
             updateTime();
+        }
+    }
+
+    @Override
+    public void allDeparturesRetreived(boolean success) {
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        if(success) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    fillDeparturesList(true);
+                }
+            });
+            updateTime();
+        } else {
+            setError(getString(R.string.dep_failed));
         }
     }
 
@@ -90,104 +126,21 @@ public class DeparturesActivity extends WearableActivity implements GetDeparture
         v.setText(m_timeFmt.format(new Date()));
     }
 
-    private void fillDeparturesList(Departure[] departures) {
-        WearableListView lst = (WearableListView) findViewById(R.id.departuresList);
+    private void fillDeparturesList(boolean complete) {
+        m_adapter.notifyDataSetChanged();
+
+        WearableRecyclerView lst = (WearableRecyclerView) findViewById(R.id.departuresList);
         lst.setClickable(false);
-        lst.setAdapter(new DeparturesAdapter(departures));
         lst.setVisibility(View.VISIBLE);
 
         View v = findViewById(R.id.progressbar);
-        v.setVisibility(View.GONE);
+        v.setVisibility(complete ? View.GONE : View.VISIBLE);
         v = findViewById(R.id.time);
         v.setVisibility(View.VISIBLE);
         v = findViewById(R.id.error);
         v.setVisibility(View.GONE);
 
         setAmbientEnabled();
-    }
-
-    private boolean parseDepartures() {
-        ByteArrayInputStream bs = null;
-        ObjectInputStream out = null;
-        try {
-            bs = new ByteArrayInputStream(m_departures);
-            out = new ObjectInputStream(bs);
-
-            String from = null;
-            String to = null;
-
-            Bundle extras = getIntent().getExtras();
-            if(extras != null) {
-                from = extras.getString("from", null);
-                to = extras.getString("to", null);
-                if(from != null)
-                    from = from.toLowerCase();
-                if(to != null)
-                    to = to.toLowerCase();
-            }
-
-            final int count = out.readInt();
-            if(count == 0) {
-                return false;
-            }
-
-            final Departure[] departures = new Departure[count];
-            final SimpleDateFormat fmt = new SimpleDateFormat("HH:mm");
-            for(int i = 0; i < count; ++i) {
-                Departure dep = new Departure();
-                Date depTime = (Date)out.readObject();
-                Date arrTime = (Date)out.readObject();
-                dep.departure = fmt.format(depTime);
-                dep.arrival = fmt.format(arrTime);
-
-                StringBuilder extraInfo = new StringBuilder();
-                final int trainCnt = out.readInt() - 1;
-                extraInfo.append("# ");
-                for(int tr = 0; tr < trainCnt; ++tr)
-                    extraInfo.append(out.readUTF()).append(", ");
-                if(trainCnt >= 0)
-                    extraInfo.append(out.readUTF());
-                extraInfo.append("\n");
-
-                final String depStation = out.readUTF().toLowerCase();
-                final String arrStation = out.readUTF().toLowerCase();
-
-                if(from != null && !depStation.equals(from))
-                    dep.departure += "*";
-
-                if(to != null && !arrStation.equals(to))
-                    dep.arrival += "*";
-
-                long durationMin = TimeUnit.MINUTES.convert(arrTime.getTime() - depTime.getTime(), TimeUnit.MILLISECONDS);
-                if(durationMin >= 60)  {
-                    extraInfo.append(durationMin/60)
-                            .append("h ");
-                    durationMin = durationMin%60;
-                }
-                extraInfo.append(durationMin)
-                        .append(" min");
-                dep.extraInfo = extraInfo.toString();
-
-                dep.delayQuery = out.readUTF();
-                dep.delayMinutes = out.readInt();
-
-                departures[i] = dep;
-            }
-
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    fillDeparturesList(departures);
-                }
-            });
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-            return false;
-        }  finally {
-            if(out != null) { try { out.close(); } catch(IOException e) { e.printStackTrace(); } }
-            if(bs != null) { try { bs.close(); } catch(IOException e) { e.printStackTrace(); } }
-        }
-        return true;
     }
 
     @Override
@@ -200,11 +153,7 @@ public class DeparturesActivity extends WearableActivity implements GetDeparture
         TextView t = (TextView)l.findViewById(R.id.time);
         t.setTextColor(Color.WHITE);
 
-        WearableListView lst = (WearableListView) findViewById(R.id.departuresList);
-        DeparturesAdapter adapter = (DeparturesAdapter) lst.getAdapter();
-        if(adapter != null) {
-            adapter.setAmbient(true);
-        }
+        m_adapter.setAmbient(true);
     }
 
     @Override
@@ -217,11 +166,7 @@ public class DeparturesActivity extends WearableActivity implements GetDeparture
         TextView t = (TextView)l.findViewById(R.id.time);
         t.setTextColor(Color.BLACK);
 
-        WearableListView lst = (WearableListView) findViewById(R.id.departuresList);
-        DeparturesAdapter adapter = (DeparturesAdapter) lst.getAdapter();
-        if(adapter != null) {
-            adapter.setAmbient(false);
-        }
+        m_adapter.setAmbient(false);
 
         updateTime();
     }
@@ -233,5 +178,6 @@ public class DeparturesActivity extends WearableActivity implements GetDeparture
     }
 
     private SimpleDateFormat m_timeFmt = new SimpleDateFormat("HH:mm");
-    private byte[] m_departures;
+    private ArrayList<DepartureInfo> m_departures;
+    private DeparturesAdapter m_adapter;
 }
