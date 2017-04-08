@@ -9,8 +9,8 @@ android {
         applicationId "com.tassadar.weartran"
         minSdkVersion 25
         targetSdkVersion 25
-        versionCode 21
-        versionName "2.1"
+        versionCode 22
+        versionName "2.2"
     }
     buildTypes {
         debug {
@@ -29,5 +29,5 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.google.android.support:wearable:2.0.1'
     provided 'com.google.android.wearable:wearable:2.0.1'
-    compile group:'com.google.code.ksoap2-android', name: 'ksoap2-android', version: '3.4.0'
+    compile group:'com.google.code.ksoap2-android', name: 'ksoap2-android', version: '3.6.2'
 }

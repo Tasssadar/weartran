@@ -17,3 +17,5 @@
 #}
 
 -dontwarn org.xmlpull.v1.**
+-dontwarn okio.Okio
+-dontwarn okio.DeflaterSink
