@@ -91,6 +91,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="ksoap2-j2se-3.6.2" level="project" />
     <orderEntry type="library" exported="" name="okio-1.6.0" level="project" />
+    <orderEntry type="library" exported="" name="cz.seznam.anuc" level="project" />
     <orderEntry type="library" exported="" name="percent-25.2.0" level="project" />
     <orderEntry type="library" exported="" name="ksoap2-android-3.6.2" level="project" />
     <orderEntry type="library" exported="" name="wearable-2.0.1" level="project" />

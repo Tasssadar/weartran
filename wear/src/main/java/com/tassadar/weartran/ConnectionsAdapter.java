@@ -7,30 +7,37 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.tassadar.weartran.api.Connection;
+
 public class ConnectionsAdapter extends WearableRecyclerView.Adapter<ConnectionsAdapter.ConnectionViewHolder> {
-    private static class Connection {
-        public Connection(final String dp, final String from, final String to) {
-            this.dp = dp;
-            this.from = from;
-            this.to = to;
-        }
-
-        public String dp;
-        public String from;
-        public String to;
-    };
-
+    // seznam ids & coords from places.go script
     private static final Connection[] stations = {
-            new Connection("IDSJMK", "Životského", "Vojtova"),
-            new Connection("IDSJMK", "Vojtova", "Životského"),
-            new Connection("IDSJMK", "Životského", "Hlavní nádraží"),
-            new Connection("IDSJMK", "Hlavní nádraží", "Životského"),
-            new Connection("IDSJMK", "Životského", "Švermova"),
-            new Connection("IDSJMK", "Švermova", "Životského"),
-            new Connection("IDSJMK", "Hlavní nádraží", "Švermova"),
-            new Connection("IDSJMK", "Vojtova", "Švermova"),
-            new Connection("VlakBusCZ", "Brno hl.n.", "Praha hl.n."),
-            new Connection("VlakBusCZ", "Praha hl.n.", "Brno hl.n."),
+            new Connection("IDSJMK", "Životského", "Křídlovická",
+                    0x00e810c6, 49.190680, 16.634235, 0x00e8123a, 49.185304, 16.602648),
+            new Connection("IDSJMK", "Křídlovická", "Životského",
+                    0x00e8123a, 49.185304, 16.602648, 0x00e810c6, 49.190680, 16.634235),
+            new Connection("IDSJMK", "Tržní", "Chrlická",
+                    0x00e80ee1, 49.189576, 16.630827, 0x00e810a2, 49.144132, 16.665113),
+            new Connection("IDSJMK", "Úzká", "Chrlická",
+                    0x00e81216, 49.190028, 16.614611, 0x00e810a2, 49.144132, 16.665113),
+            new Connection("IDSJMK", "Chrlická", "Úzká",
+                    0x00e810a2, 49.144132, 16.665113, 0x00e81216, 49.190028, 16.614611),
+            new Connection("IDSJMK", "Životského", "Hlavní nádraží",
+                    0x00e810c6, 49.190680, 16.634235, 0x00e80ffe, 49.191152, 16.613029),
+            new Connection("IDSJMK", "Hlavní nádraží", "Životského",
+                    0x00e80ffe, 49.191152, 16.613029, 0x00e810c6, 49.190680, 16.634235),
+            new Connection("IDSJMK", "Životského", "Švermova",
+                    0x00e810c6, 49.190680, 16.634235, 0x00e80f8b, 49.169228, 16.573183),
+            new Connection("IDSJMK", "Švermova", "Životského",
+                    0x00e80f8b, 49.169228, 16.573183, 0x00e810c6, 49.190680, 16.634235),
+            new Connection("IDSJMK", "Hlavní nádraží", "Švermova",
+                    0x00e80ffe, 49.191152, 16.613029, 0x00e80f8b, 49.169228, 16.573183),
+            new Connection("IDSJMK", "Vojtova", "Švermova",
+                    0x00e80ad4, 49.182720, 16.600519, 0x00e80f8b, 49.169228, 16.573183),
+            new Connection("VlakBusCZ", "Brno hl.n.", "Praha hl.n.",
+                    0x00e81a31, 49.190588, 16.612799, 0x00e82004, 50.083016, 14.436977),
+            new Connection("VlakBusCZ", "Praha hl.n.", "Brno hl.n.",
+                    0x00e82004, 50.083016, 14.436977, 0x00e81a31, 49.190588, 16.612799),
     };
 
     public static class ConnectionViewHolder extends WearableRecyclerView.ViewHolder {
@@ -50,15 +57,9 @@ public class ConnectionsAdapter extends WearableRecyclerView.Adapter<Connections
             m_conn = c;
         }
 
-        public String getFromStop() {
-            return m_conn.from;
+        public Connection getConnection() {
+            return m_conn;
         }
-
-        public String getToStop() {
-            return m_conn.to;
-        }
-
-        public String getDp() { return m_conn.dp; }
     }
 
     private final ItemClickListener m_listener;

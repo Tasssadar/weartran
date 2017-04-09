@@ -16,13 +16,13 @@ public class DepartureInfo {
 
     public Date depTime;
     public Date arrTime;
-    public String depStation;
-    public String arrStation;
+    public boolean depStationDifferent;
+    public boolean arrStationDifferent;
     public String[] trains;
-    public String delayQuery;
     public int delayMinutes;
 
-    int connId;
+    public String idosDelayQuery;
+    public int idosConnId;
 
     public static byte[] serialize(List<DepartureInfo> departures) {
         ByteArrayOutputStream bs = null;
@@ -39,9 +39,8 @@ public class DepartureInfo {
                 for(String tr : i.trains) {
                     out.writeUTF(tr);
                 }
-                out.writeUTF(i.depStation);
-                out.writeUTF(i.arrStation);
-                out.writeUTF(i.delayQuery != null ? i.delayQuery : "");
+                out.writeBoolean(i.depStationDifferent);
+                out.writeBoolean(i.arrStationDifferent);
                 out.writeInt(i.delayMinutes);
             }
             out.close();
@@ -75,9 +74,8 @@ public class DepartureInfo {
                     inf.trains[x] = in.readUTF();
                 }
 
-                inf.depStation = in.readUTF();
-                inf.arrStation = in.readUTF();
-                inf.delayQuery = in.readUTF();
+                inf.depStationDifferent = in.readBoolean();
+                inf.arrStationDifferent = in.readBoolean();;
                 inf.delayMinutes = in.readInt();
             }
 

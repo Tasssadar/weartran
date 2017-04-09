@@ -1,60 +1,42 @@
 package com.tassadar.weartran.api;
 
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
-import android.util.Log;
 
-import com.tassadar.weartran.WeartranApp;
+import com.tassadar.weartran.api.idos.IdosGetDeparturesTask;
+import com.tassadar.weartran.api.seznam.SeznamGetDeparturesTask;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.lang.ref.WeakReference;
-import java.text.ParseException;
-import java.util.Date;
 import java.util.List;
 
-public class GetDeparturesTask extends AsyncTask<String, List<DepartureInfo>, Boolean> implements IdosApi.DeparturesBlockListener {
-    private static final String TAG = "Weartran:GetDepartures";
+/**
+ * Created by tassadar on 9.4.17.
+ */
 
+public abstract class GetDeparturesTask extends AsyncTask<Connection, List<DepartureInfo>, Boolean> {
     public interface OnCompleteListener {
         void departuresRetreived(List<DepartureInfo> departures);
         void allDeparturesRetreived(boolean success);
     }
 
+    public static final int API_IDOS = 0;
+    public static final int API_SEZNAM = 1;
+
+    public static final int API_DEFAULT = API_SEZNAM;
+
+    public static GetDeparturesTask create(int api, OnCompleteListener listener) {
+        switch(api) {
+            case API_IDOS:
+                return new IdosGetDeparturesTask(listener);
+            case API_SEZNAM:
+                return new SeznamGetDeparturesTask(listener);
+        }
+        return null;
+    }
+
+    protected WeakReference<OnCompleteListener> m_listener;
+
     public GetDeparturesTask(OnCompleteListener listener) {
         m_listener = new WeakReference<>(listener);
-    }
-
-    @Override
-    protected Boolean doInBackground(String... args) {
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(WeartranApp.ctx());
-        String savedSessionId = pref.getString("IdosApiSession", null);
-
-        // See comment about credentials in IdosApi.java
-        IdosApi api = new IdosApi(savedSessionId, new IdosApiCredentials());
-
-        long start = System.currentTimeMillis();
-        if(savedSessionId == null && !api.login())
-            return false;
-        Log.i(TAG, "Login took " + (System.currentTimeMillis() - start) + "ms");
-
-        DepartureInfo[] dep = api.getDepartures(args[0], args[1], args[2], new Date(), 9, true, this);
-        if(dep == null || dep.length == 0)
-            return false;
-
-        if(savedSessionId == null || !savedSessionId.equals(api.getSessionId())) {
-            SharedPreferences.Editor e = pref.edit();
-            e.putString("IdosApiSession", api.getSessionId());
-            e.apply();
-        }
-        return true;
-    }
-
-    @Override
-    public void onDeparturesBlockFetched(List<DepartureInfo> block) {
-        this.publishProgress(block);
     }
 
     @Override
@@ -72,6 +54,4 @@ public class GetDeparturesTask extends AsyncTask<String, List<DepartureInfo>, Bo
             return;
         l.allDeparturesRetreived(res);
     }
-
-    private WeakReference<OnCompleteListener> m_listener;
 }

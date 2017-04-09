@@ -25,9 +25,7 @@ public class MainActivity extends Activity implements ItemClickListener {
         ConnectionsAdapter.ConnectionViewHolder h = (ConnectionsAdapter.ConnectionViewHolder) viewHolder;
 
         Intent intent = new Intent(this, DeparturesActivity.class);
-        intent.putExtra("dp", h.getDp());
-        intent.putExtra("from", h.getFromStop());
-        intent.putExtra("to", h.getToStop());
+        intent.putExtra("connection", h.getConnection());
         startActivity(intent);
     }
 }

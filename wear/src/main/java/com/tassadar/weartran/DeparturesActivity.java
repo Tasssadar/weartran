@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import com.tassadar.weartran.api.Connection;
 import com.tassadar.weartran.api.DepartureInfo;
 import com.tassadar.weartran.api.GetDeparturesTask;
 
@@ -31,7 +32,8 @@ public class DeparturesActivity extends WearableActivity implements GetDeparture
 
         m_departures = new ArrayList<>();
 
-        m_adapter = new DeparturesAdapter(m_departures, getIntent().getStringExtra("from"), getIntent().getStringExtra("to"));
+        Connection c = (Connection)getIntent().getSerializableExtra("connection");
+        m_adapter = new DeparturesAdapter(m_departures);
         WearableRecyclerView lst = (WearableRecyclerView) findViewById(R.id.departuresList);
         lst.setCenterEdgeItems(true);
         if(getResources().getConfiguration().isScreenRound())
@@ -52,8 +54,9 @@ public class DeparturesActivity extends WearableActivity implements GetDeparture
     @Override
     protected void onSaveInstanceState(Bundle out) {
         super.onSaveInstanceState(out);
-        if(!m_departures.isEmpty())
+        if(!m_departures.isEmpty()) {
             out.putByteArray("departures", DepartureInfo.serialize(m_departures));
+        }
     }
 
     private void requestDepartures() {
@@ -63,17 +66,15 @@ public class DeparturesActivity extends WearableActivity implements GetDeparture
         }
 
         Bundle extras = getIntent().getExtras();
-        if(extras == null || !extras.containsKey("from") || !extras.containsKey("to"))
+        if(extras == null || !extras.containsKey("connection"))
             return;
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        String dp = extras.getString("dp");
-        String from = extras.getString("from");
-        String to = extras.getString("to");
-        Log.i(TAG, "Handling departures request for path " + from + " -> " + to);
-        GetDeparturesTask task = new GetDeparturesTask(this);
-        task.execute(dp, from, to);
+        Connection c = (Connection)extras.getSerializable("connection");
+        Log.i(TAG, "Handling departures request for path " + c.from + " -> " + c.to);
+        GetDeparturesTask task = GetDeparturesTask.create(GetDeparturesTask.API_DEFAULT, this);
+        task.execute(c);
     }
 
     @Override

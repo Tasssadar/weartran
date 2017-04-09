@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.tassadar.weartran.api.Connection;
 import com.tassadar.weartran.api.DepartureInfo;
 
 import java.text.SimpleDateFormat;
@@ -22,30 +23,25 @@ public class DeparturesAdapter extends WearableRecyclerView.Adapter<DeparturesAd
         private TextView m_delay;
         private TextView m_extraInfo;
         private ImageView m_icon;
-        private String m_from;
-        private String m_to;
 
         private static final SimpleDateFormat fmt = new SimpleDateFormat("HH:mm");
 
-        public DepartureViewHolder(View v, String from, String to) {
+        public DepartureViewHolder(View v) {
             super(v);
             m_departure = (TextView)v.findViewById(R.id.departure);
             m_arrival = (TextView)v.findViewById(R.id.arrival);
             m_delay = (TextView)v.findViewById(R.id.delay);
             m_extraInfo = (TextView)v.findViewById(R.id.extraInfo);
             m_icon = (ImageView)v.findViewById(R.id.icon);
-
-            m_from = from;
-            m_to = to;
         }
 
         public void setData(DepartureInfo dep, boolean ambient) {
             String departure = fmt.format(dep.depTime);
             String arrival = fmt.format(dep.arrTime);
-            if(m_from != null && !dep.depStation.toLowerCase().equals(m_from))
-                departure += "*";
 
-            if(m_to != null && !dep.arrStation.toLowerCase().equals(m_to))
+            if(dep.depStationDifferent)
+                departure += "*";
+            if(dep.arrStationDifferent)
                 arrival += "*";
 
             m_departure.setText(departure);
@@ -86,17 +82,15 @@ public class DeparturesAdapter extends WearableRecyclerView.Adapter<DeparturesAd
         }
     }
 
-    public DeparturesAdapter(List<DepartureInfo> departures, String from, String to) {
+    public DeparturesAdapter(List<DepartureInfo> departures) {
         super();
         m_departures = departures;
-        m_from = from.toLowerCase();
-        m_to = to.toLowerCase();
     }
 
     @Override
     public DepartureViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.departures_list_it, parent, false);
-        return new DepartureViewHolder(v, m_from, m_to);
+        return new DepartureViewHolder(v);
     }
 
     @Override
@@ -117,6 +111,5 @@ public class DeparturesAdapter extends WearableRecyclerView.Adapter<DeparturesAd
     }
 
     private List<DepartureInfo> m_departures;
-    private String m_from, m_to;
-    private boolean m_ambientMode = false;
+    private boolean m_ambientMode;
 }
