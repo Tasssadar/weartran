@@ -3,6 +3,8 @@ package com.tassadar.weartran;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView.OnScrollListener;
 import android.support.wearable.activity.WearableActivity;
 import android.support.wearable.view.CurvedChildLayoutManager;
 import android.support.wearable.view.WearableRecyclerView;
@@ -33,22 +35,24 @@ public class DeparturesActivity extends WearableActivity implements GetDeparture
 
         m_departures = new ArrayList<>();
 
-        Connection c = (Connection)getIntent().getSerializableExtra("connection");
         m_adapter = new DeparturesAdapter(m_departures);
         WearableRecyclerView lst = (WearableRecyclerView) findViewById(R.id.departuresList);
         lst.setCenterEdgeItems(true);
         if(getResources().getConfiguration().isScreenRound())
-            lst.setLayoutManager(new ResizingCurvedLayoutManager(this));
+            m_layoutManager = new ResizingCurvedLayoutManager(this);
         else
-            lst.setLayoutManager(new CurvedChildLayoutManager(this));
+            m_layoutManager = new CurvedChildLayoutManager(this);
+        lst.setLayoutManager(m_layoutManager);
         lst.setAdapter(m_adapter);
+        lst.addOnScrollListener(m_scrollListener);
+
+        updateTime();
 
         if(savedInstanceState != null && savedInstanceState.containsKey("departures")) {
             DepartureInfo.deserialize(savedInstanceState.getByteArray("departures"), m_departures);
             fillDeparturesList(true);
-            updateTime();
         } else {
-            requestDepartures();
+            requestDepartures(new Date());
         }
     }
 
@@ -60,22 +64,30 @@ public class DeparturesActivity extends WearableActivity implements GetDeparture
         }
     }
 
-    private void requestDepartures() {
-        if(!m_departures.isEmpty()) {
-            updateTime();
-            return;
-        }
-
+    private void requestDepartures(Date when) {
         Bundle extras = getIntent().getExtras();
-        if(extras == null || !extras.containsKey("connection"))
+        if(m_loadingDepartures || extras == null || !extras.containsKey("connection"))
             return;
+
+        m_loadingDepartures = true;
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         Connection c = (Connection)extras.getSerializable("connection");
-        Log.i(TAG, "Handling departures request for path " + c.from + " -> " + c.to);
+        Log.i(TAG, "Handling departures request for path " + c.from + " -> " + c.to + " at " + when.toString());
         GetDeparturesTask task = GetDeparturesTask.create(GetDeparturesTask.API_DEFAULT, this);
-        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, c);
+        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, c, when);
+
+        View v = findViewById(R.id.progressbar);
+        v.setVisibility(View.VISIBLE);
+    }
+
+    private void requestMoreDepartures() {
+        if(m_loadingDepartures || m_departures.size() == 0)
+            return;
+
+        final DepartureInfo last = m_departures.get(m_departures.size()-1);
+        requestDepartures(new Date(last.depTime.getTime() + 60*1000));
     }
 
     @Override
@@ -97,6 +109,8 @@ public class DeparturesActivity extends WearableActivity implements GetDeparture
     @Override
     public void allDeparturesRetreived(boolean success) {
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        m_loadingDepartures = false;
+
         if(success) {
             runOnUiThread(new Runnable() {
                 @Override
@@ -137,8 +151,6 @@ public class DeparturesActivity extends WearableActivity implements GetDeparture
 
         View v = findViewById(R.id.progressbar);
         v.setVisibility(complete ? View.GONE : View.VISIBLE);
-        v = findViewById(R.id.time);
-        v.setVisibility(View.VISIBLE);
         v = findViewById(R.id.error);
         v.setVisibility(View.GONE);
 
@@ -179,7 +191,23 @@ public class DeparturesActivity extends WearableActivity implements GetDeparture
         updateTime();
     }
 
+    private final OnScrollListener m_scrollListener = new OnScrollListener() {
+        @Override
+        public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+            if(m_layoutManager.findLastVisibleItemPosition() == m_adapter.getItemCount()-1) {
+                requestMoreDepartures();
+            }
+        }
+
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+
+        }
+    };
+
     private SimpleDateFormat m_timeFmt = new SimpleDateFormat("HH:mm");
     private ArrayList<DepartureInfo> m_departures;
     private DeparturesAdapter m_adapter;
+    private CurvedChildLayoutManager m_layoutManager;
+    private boolean m_loadingDepartures;
 }

@@ -2,6 +2,7 @@ package com.tassadar.weartran;
 
 import android.graphics.Color;
 import android.support.wearable.view.WearableRecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

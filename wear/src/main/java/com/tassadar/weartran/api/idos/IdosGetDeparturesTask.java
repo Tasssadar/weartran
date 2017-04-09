@@ -22,8 +22,9 @@ public class IdosGetDeparturesTask extends GetDeparturesTask implements IdosApi.
     }
 
     @Override
-    protected Boolean doInBackground(Connection... connections) {
-        final Connection c = connections[0];
+    protected Boolean doInBackground(Object... args) {
+        final Connection c = (Connection)args[0];
+        final Date when = (Date)args[1];
 
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(WeartranApp.ctx());
         String savedSessionId = pref.getString("IdosApiSession", null);
@@ -36,7 +37,7 @@ public class IdosGetDeparturesTask extends GetDeparturesTask implements IdosApi.
             return false;
         Log.i(TAG, "Login took " + (System.currentTimeMillis() - start) + "ms");
 
-        DepartureInfo[] dep = api.getDepartures(c, new Date(), 9, true, this);
+        DepartureInfo[] dep = api.getDepartures(c, when, GetDeparturesTask.MAX_DEPARTURES, true, this);
         if(dep == null || dep.length == 0)
             return false;
 

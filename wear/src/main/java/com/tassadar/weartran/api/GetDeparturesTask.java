@@ -12,11 +12,13 @@ import java.util.List;
  * Created by tassadar on 9.4.17.
  */
 
-public abstract class GetDeparturesTask extends AsyncTask<Connection, List<DepartureInfo>, Boolean> {
+public abstract class GetDeparturesTask extends AsyncTask<Object, List<DepartureInfo>, Boolean> {
     public interface OnCompleteListener {
         void departuresRetreived(List<DepartureInfo> departures);
         void allDeparturesRetreived(boolean success);
     }
+
+    public static final int MAX_DEPARTURES = 3;
 
     public static final int API_IDOS = 0;
     public static final int API_SEZNAM = 1;

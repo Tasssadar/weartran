@@ -48,17 +48,21 @@ public class SeznamGetDeparturesTask extends GetDeparturesTask {
     }
 
     @Override
-    protected Boolean doInBackground(Connection... connections) {
-        Connection c = connections[0];
+    protected Boolean doInBackground(Object... args) {
+        Connection c = (Connection)args[0];
+        Date when = (Date)args[1];
+
         MapAnucStruct resp = null;
         ArrayList<DepartureInfo> res = new ArrayList<>();
         try {
             Calendar time = Calendar.getInstance(TimeZone.getTimeZone("Europe/Prague"));
+            time.setTime(when);
+
             HashMap params = new HashMap();
             params.put("start", getPlaceParam(c, true));
             params.put("end", getPlaceParam(c, false));
             params.put("index", 0);
-            params.put("count", 9);
+            params.put("count", GetDeparturesTask.MAX_DEPARTURES);
 
             HashMap flags = new HashMap();
             flags.put("unixt", 1);
