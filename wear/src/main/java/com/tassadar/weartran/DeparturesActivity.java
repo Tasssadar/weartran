@@ -1,6 +1,7 @@
 package com.tassadar.weartran;
 
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
 import android.support.wearable.view.CurvedChildLayoutManager;
@@ -74,7 +75,7 @@ public class DeparturesActivity extends WearableActivity implements GetDeparture
         Connection c = (Connection)extras.getSerializable("connection");
         Log.i(TAG, "Handling departures request for path " + c.from + " -> " + c.to);
         GetDeparturesTask task = GetDeparturesTask.create(GetDeparturesTask.API_DEFAULT, this);
-        task.execute(c);
+        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, c);
     }
 
     @Override
