@@ -1,8 +1,7 @@
 .gradle
 /local.properties
-/.idea/workspace.xml
-/.idea/libraries
 .DS_Store
 /build
+.idea
 
-/wear/src/main/java/com/tassadar/weartran/api/idos/IdosApiCredentials.java
+IdosApiCredentials.java
