@@ -6,10 +6,13 @@ import com.tassadar.weartran.api.Connection;
 import com.tassadar.weartran.api.DepartureInfo;
 import com.tassadar.weartran.api.GetDeparturesTask;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -23,7 +26,10 @@ import cz.seznam.anuc.exceptions.AnucException;
  */
 
 public class SeznamGetDeparturesTask extends GetDeparturesTask {
-    private static final String TAG = "SeznamGetDep";
+    private static final String TAG = "Weartran:SeznamGetDep";
+
+    private static final DateFormat ISO_DATE = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US);
+
     public SeznamGetDeparturesTask(OnCompleteListener listener) {
         super(listener);
     }
@@ -103,8 +109,8 @@ public class SeznamGetDeparturesTask extends GetDeparturesTask {
                 }
 
                 DepartureInfo dep = new DepartureInfo();
-                dep.depTime = new Date(r.getLong("departureMinute")*1000);
-                dep.arrTime = new Date(r.getLong("arrivalMinute")*1000);
+                dep.depTime = ISO_DATE.parse(r.getString("departureISO"));
+                dep.arrTime = ISO_DATE.parse(r.getString("arrivalISO"));
                 dep.depStationDifferent = r.getLong("startStopID") != c.sznFromId;
                 dep.arrStationDifferent = r.getLong("endStopID") != c.sznToId;
                 dep.trains = trains.toArray(new String[trains.size()]);
