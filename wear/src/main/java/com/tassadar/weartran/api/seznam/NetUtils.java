@@ -301,7 +301,7 @@ public class NetUtils {
 
     public static MapAnucStruct callFrpc(String url, String method, Object[] params) throws AnucException {
         CallResponse resp = new AnucClient(NetUtils.anucConfig, new FrpcConnectionWrapper(method, params), new FrpcUnmarschaller())
-                .post(url, new AnucPair[0]);
+                .post(url);
         return ((FrpcResponseData)resp.data).data;
     }
 

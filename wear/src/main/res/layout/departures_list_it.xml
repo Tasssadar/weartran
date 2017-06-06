@@ -12,7 +12,7 @@
         android:layout_height="wrap_content">
 
         <ImageView android:id="@+id/icon"
-            android:layout_width="wrap_content"
+            android:layout_width="13dp"
             android:layout_height="wrap_content"
             android:src="@drawable/connection"
             android:layout_centerVertical="true"
@@ -55,7 +55,7 @@
                 android:id="@+id/extraInfo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#757575"
+                android:textColor="#d7d7d7"
                 android:gravity="end"
                 android:textSize="12sp"
                 android:fontFamily="sans-serif-light"/>

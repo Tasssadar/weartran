@@ -14,7 +14,7 @@
    id="svg2"
    inkscape:label="Pozadí"
    version="1.1"
-   inkscape:version="0.48.5 r10040"
+   inkscape:version="0.92.1 r15371"
    inkscape:export-filename="/home/tassadar/AndroidStudioProjects/Weartran/wear/icons_big/connection.png"
    inkscape:export-xdpi="21.893602"
    inkscape:export-ydpi="21.893602"
@@ -29,34 +29,38 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.7"
-     inkscape:cx="626.24382"
-     inkscape:cy="545.02623"
+     inkscape:cx="-3.7561843"
+     inkscape:cy="373.59766"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      showguides="false"
      inkscape:guide-bbox="true"
-     inkscape:window-width="1920"
-     inkscape:window-height="1032"
-     inkscape:window-x="-4"
-     inkscape:window-y="-3"
+     inkscape:window-width="1366"
+     inkscape:window-height="712"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
      inkscape:window-maximized="1">
     <sodipodi:guide
        orientation="1,0"
        position="372.04724,874.28571"
-       id="guide3760" />
+       id="guide3760"
+       inkscape:locked="false" />
     <sodipodi:guide
        orientation="0,1"
        position="454.28571,319.28571"
-       id="guide3762" />
+       id="guide3762"
+       inkscape:locked="false" />
     <sodipodi:guide
        orientation="1,0"
        position="491.94429,636.3961"
-       id="guide3764" />
+       id="guide3764"
+       inkscape:locked="false" />
     <sodipodi:guide
        orientation="1,0"
        position="250.51783,456.58895"
-       id="guide3766" />
+       id="guide3766"
+       inkscape:locked="false" />
   </sodipodi:namedview>
   <metadata
      id="metadata6">
@@ -66,7 +70,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -101,7 +105,7 @@
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cc" />
     <path
-       style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#333333;fill-opacity:0.6;stroke:none;stroke-width:94.87179565;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans"
+       style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#00bfa5;fill-opacity:1;stroke:none;stroke-width:94.87179565;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans"
        d="m 373.08493,58.799384 c -84.38095,0 -153.8582,69.477256 -153.8582,153.858196 0,66.51549 43.19604,123.80295 102.8116,145.07771 l 0,440.22202 -68.00891,-68.00891 -72.27944,72.27943 155.2152,155.21521 36.15967,36.11975 36.11975,-36.11975 153.0999,-153.13983 -72.23954,-72.23951 -65.89361,65.89361 0,-440.22202 c 59.60605,-21.28483 102.7717,-78.57543 102.7717,-145.07771 0,-84.38094 -69.51715,-153.858196 -153.89812,-153.858196 z m 0,102.173016 c 29.16255,0 51.72509,22.52264 51.72509,51.68518 0,29.16255 -22.56254,51.72508 -51.72509,51.72508 -29.16254,0 -51.68517,-22.56253 -51.68517,-51.72508 0,-29.16254 22.52263,-51.68518 51.68517,-51.68518 z"
        id="path2984-5-2"
        inkscape:connector-curvature="0"

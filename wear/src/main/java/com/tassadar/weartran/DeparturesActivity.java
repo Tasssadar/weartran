@@ -9,6 +9,7 @@ import android.support.wearable.activity.WearableActivity;
 import android.support.wearable.view.CurvedChildLayoutManager;
 import android.support.wearable.view.WearableRecyclerView;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
@@ -164,9 +165,6 @@ public class DeparturesActivity extends WearableActivity implements GetDeparture
         View l = findViewById(R.id.main_layout);
         l.setBackgroundColor(Color.BLACK);
 
-        TextView t = (TextView)l.findViewById(R.id.time);
-        t.setTextColor(Color.WHITE);
-
         m_adapter.setAmbient(true);
     }
 
@@ -174,11 +172,10 @@ public class DeparturesActivity extends WearableActivity implements GetDeparture
     public void onExitAmbient() {
         super.onExitAmbient();
 
+        TypedValue clr = new TypedValue();
+        getTheme().resolveAttribute(android.R.attr.windowBackground, clr, true);
         View l = findViewById(R.id.main_layout);
-        l.setBackgroundColor(Color.WHITE);
-
-        TextView t = (TextView)l.findViewById(R.id.time);
-        t.setTextColor(Color.BLACK);
+        l.setBackgroundColor(clr.data);
 
         m_adapter.setAmbient(false);
 

@@ -67,11 +67,7 @@ public class DeparturesAdapter extends WearableRecyclerView.Adapter<DeparturesAd
                     .append(" min");
 
             m_extraInfo.setText(extraInfo.toString());
-
-            m_departure.setTextColor(!ambient ? Color.BLACK : Color.WHITE);
-            m_arrival.setTextColor(!ambient ? Color.BLACK : Color.WHITE);
-            m_extraInfo.setTextColor(!ambient ? 0xFF757575 : 0xFFFFFFFF);
-            m_icon.setVisibility(!ambient ? View.VISIBLE : View.GONE);
+            m_icon.setVisibility(!ambient ? View.VISIBLE : View.INVISIBLE);
 
             if(dep.delayMinutes > 0) {
                 m_delay.setText(String.format("%d min", dep.delayMinutes));
