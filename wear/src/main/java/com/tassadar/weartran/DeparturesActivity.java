@@ -5,9 +5,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.OnScrollListener;
+import android.support.wear.widget.WearableLinearLayoutManager;
 import android.support.wearable.activity.WearableActivity;
-import android.support.wearable.view.CurvedChildLayoutManager;
-import android.support.wearable.view.WearableRecyclerView;
+import android.support.wear.widget.WearableRecyclerView;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
@@ -38,11 +38,10 @@ public class DeparturesActivity extends WearableActivity implements GetDeparture
 
         m_adapter = new DeparturesAdapter(m_departures);
         WearableRecyclerView lst = (WearableRecyclerView) findViewById(R.id.departuresList);
-        lst.setCenterEdgeItems(true);
+        lst.setEdgeItemsCenteringEnabled(true);
+        m_layoutManager = new WearableLinearLayoutManager(this);
         if(getResources().getConfiguration().isScreenRound())
-            m_layoutManager = new ResizingCurvedLayoutManager(this);
-        else
-            m_layoutManager = new CurvedChildLayoutManager(this);
+            m_layoutManager.setLayoutCallback(new ResizingLayoutCallback());
         lst.setLayoutManager(m_layoutManager);
         lst.setAdapter(m_adapter);
         lst.addOnScrollListener(m_scrollListener);
@@ -205,6 +204,6 @@ public class DeparturesActivity extends WearableActivity implements GetDeparture
     private SimpleDateFormat m_timeFmt = new SimpleDateFormat("HH:mm");
     private ArrayList<DepartureInfo> m_departures;
     private DeparturesAdapter m_adapter;
-    private CurvedChildLayoutManager m_layoutManager;
+    private WearableLinearLayoutManager m_layoutManager;
     private boolean m_loadingDepartures;
 }

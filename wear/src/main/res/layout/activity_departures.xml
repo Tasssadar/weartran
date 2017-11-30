@@ -15,7 +15,7 @@
         android:layout_marginBottom="8dp"
         android:layout_alignParentTop="true" />
 
-    <android.support.wearable.view.WearableRecyclerView
+    <android.support.wear.widget.WearableRecyclerView
         android:id="@+id/departuresList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

@@ -1,7 +1,6 @@
 package com.tassadar.weartran;
 
-import android.support.wearable.view.WearableListView;
-import android.support.wearable.view.WearableRecyclerView;
+import android.support.wear.widget.WearableRecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +17,8 @@ public class ConnectionsAdapter extends WearableRecyclerView.Adapter<Connections
                     0x00e8123a, 49.185304, 16.602648, 0x00e810c6, 49.190680, 16.634235),
             new Connection("IDSJMK", "Tržní", "Chrlická",
                     0x00e80ee1, 49.189576, 16.630827, 0x00e810a2, 49.144132, 16.665113),
+            new Connection("IDSJMK", "Chrlická", "Životského",
+                    0x00e810a2, 49.144132, 16.665113, 0x00e810c6, 49.190680, 16.634235),
             new Connection("IDSJMK", "Úzká", "Chrlická",
                     0x00e81216, 49.190028, 16.614611, 0x00e810a2, 49.144132, 16.665113),
             new Connection("IDSJMK", "Chrlická", "Úzká",

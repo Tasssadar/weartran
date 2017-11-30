@@ -1,7 +1,7 @@
 package com.tassadar.weartran;
 
 import android.graphics.Color;
-import android.support.wearable.view.WearableRecyclerView;
+import android.support.wear.widget.WearableRecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.tassadar.weartran.api.Connection;
 import com.tassadar.weartran.api.DepartureInfo;
 
 import java.text.SimpleDateFormat;
